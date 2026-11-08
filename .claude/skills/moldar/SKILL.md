@@ -1,6 +1,6 @@
 ---
 name: moldar
-description: Dá forma a um problema junto com o humano até virar um pitch (com protótipo, quando tem interface), roda a revisão do protótipo e grava a aposta ou o descarte. Use quando o humano trouxer um problema novo quiser continuar um pitch em shaping, ou decidir voltar ao shaping ou descartar um pitch bloqueado.
+description: Dá forma a um problema junto com o humano até virar um pitch (com protótipo, quando tem interface), roda a revisão do protótipo e grava a aposta ou o descarte. Use quando o humano trouxer um problema novo, quiser continuar um pitch em shaping, ou decidir voltar ao shaping ou descartar um pitch bloqueado.
 disable-model-invocation: true
 ---
 
