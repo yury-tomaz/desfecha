@@ -12,6 +12,14 @@ Este arquivo é um mapa, não um manual. O que dá para descobrir lendo o códig
 - `docs/exec-plans/completed/`: tarefas concluídas, com o histórico de decisões.
 - `.claude/skills/refinar` e `.claude/skills/executar`: como um plano é refinado e executado.
 - `scripts/plan-check.sh <plano>`: verifica se um plano tem a estrutura mínima.
+- `backend/`: Spring Boot (Maven Wrapper). `frontend/`: SvelteKit com TypeScript.
+
+## Comandos
+
+- `mise install`: instala as versões de ferramenta fixadas em `mise.toml`.
+- `scripts/verify.sh`: build, testes, tipos e formatação dos dois lados. Tem que passar antes de todo commit. O CI roda o mesmo comando a cada push.
+- `scripts/format.sh`: formata os dois lados no padrão que a verificação confere.
+- `docker-compose up --build`: sobe backend (`:8080`) e frontend (`:3000`). Use `docker-compose`, não `docker compose`.
 
 ## Regras
 
