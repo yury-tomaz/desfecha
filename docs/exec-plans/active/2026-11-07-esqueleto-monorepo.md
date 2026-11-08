@@ -40,8 +40,8 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 
 ## Passos
 
-- [ ] `mise.toml` com Java 21 e Node 22
-- [ ] Backend Spring Boot mínimo com teste do endpoint de saúde
+- [x] `mise.toml` com Java 21 e Node 22
+- [x] Backend Spring Boot mínimo com teste do endpoint de saúde
 - [ ] Frontend SvelteKit mínimo
 - [ ] Formatação automática nos dois
 - [ ] Comando único de verificação na raiz
@@ -54,8 +54,17 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 - 2026-11-07: exec-plan criado.
 - 2026-11-07: refinado e aprovado.
 - 2026-11-07: execução iniciada.
+- 2026-11-07: `mise.toml` criado; `mise install` instalou Java Temurin 21.0.13, Node 22.21.1 e pnpm 10.34.9.
+- 2026-11-07: backend gerado pelo start.spring.io (Spring Boot 4.1.2, web + actuator). `HealthTest` passa com `mvnw verify`.
 
 ## Log de decisões
+
+- **D1. pnpm também fixado no `mise.toml`**: o CI e a máquina local usam a mesma versão do gerenciador de pacotes, não só do Node.
+- **D2. Java Temurin pelo mise, não o Java do sistema**: a versão fica igual no local e no CI.
+- **D3. Maven Wrapper (`mvnw`) em vez do Maven instalado**: a versão do Maven fica versionada no repositório.
+- **D4. Pacote `com.desfecha`**: segue o nome do repositório no GitHub (`desfecha`). Trocar depois é um rename simples.
+- **D5. Teste de saúde com servidor real (`RANDOM_PORT`) e `java.net.http.HttpClient`**: comprova que a aplicação sobe e responde HTTP de verdade, sem depender de cliente de teste que mudou de módulo no Spring Boot 4.
+- **D6. Spotless com google-java-format 2.0.0 e sortPom**: padrão amplamente usado; a checagem roda na fase `verify` do Maven, então `mvnw verify` já falha com código fora do padrão.
 
 ## Perguntas em aberto
 
