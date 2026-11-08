@@ -30,7 +30,7 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - [x] `.github/dependabot.yml` cobre `maven`, `npm` e `github-actions`, com cooldown. Comprovado lendo o arquivo. Ligar Dependabot alerts e security updates no GitHub é passo do humano: fica listado em `docs/SECURITY.md` e na descrição do PR, com o comando `gh api` que confere.
 - [ ] Todas as actions em `.github/workflows/` estão fixadas por SHA completo, os workflows declaram `permissions`, e zizmor e actionlint rodam em `scripts/verify.sh`. Comprovado assim: trocar um SHA por tag faz a verificação falhar; reverter faz passar.
 - [ ] `.claude/settings.json` impede o agente de ler `.env`, `~/.ssh` e `~/.aws`. Comprovado listando no log de progresso as formas testadas (ex.: `Read` de `.env`, `cat .env`, `cat ~/.ssh/id_ed25519`) e o resultado de cada uma.
-- [ ] `docs/SECURITY.md` existe, em português, e traz: as ameaças que esta base cobre e as que ainda não cobre; cada camada e onde está configurada; como registrar uma exceção; as configurações esperadas do GitHub e o comando `gh api` que as confere; como reportar uma vulnerabilidade. Comprovado lendo o arquivo.
+- [x] `docs/SECURITY.md` existe, em português, e traz: as ameaças que esta base cobre e as que ainda não cobre; cada camada e onde está configurada; como registrar uma exceção; as configurações esperadas do GitHub e o comando `gh api` que as confere; como reportar uma vulnerabilidade. Comprovado lendo o arquivo.
 - [ ] `AGENTS.md` aponta para `docs/SECURITY.md`. A skill `executar` traz a regra de dependência nova e a de exceção com prazo. Comprovado lendo os dois arquivos.
 - [ ] O código atual passa em todas as checagens novas e `scripts/verify.sh` passa local e no CI. Comprovado com `gh run list` no push do branch da tarefa.
 
@@ -54,8 +54,8 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - [x] `.github/dependabot.yml`
 - [x] Actions por SHA, `permissions`, zizmor e actionlint em `scripts/verify.sh`
 - [x] Regras `deny` de segredos em `.claude/settings.json`
-- [ ] `docs/SECURITY.md`
-- [ ] Atualizar `AGENTS.md` e a skill `executar`
+- [x] `docs/SECURITY.md`
+- [x] Atualizar `AGENTS.md` e a skill `executar`
 
 ## Log de progresso
 
@@ -76,6 +76,8 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - 2026-11-07: sugestão de próxima tarefa: ligar o sandbox do Claude Code (`sandbox.enabled`) para o projeto. As regras `Read` cobrem as ferramentas e os comandos de arquivo que o Claude Code reconhece no Bash (`cat`, `head`, `tail`, `sed`...), mas não um script Node ou Python que abre o arquivo sozinho. O sandbox bloqueia no sistema operacional e já herda essas regras, mas muda rede e execução de toda sessão, por isso precisa de decisão do humano.
 - 2026-11-07: sugestão de próxima tarefa: o `.gitignore` da raiz não ignora `.env`. Só o `frontend/` tem o seu.
 - 2026-11-07: bug achado no push do branch: o hook de pre-push roda com `GIT_DIR` do repositório, o `segredos-check.test.sh` herdou a variável e o `git init`/`git add` dos repositórios de teste trocaram o índice da worktree pelo deles (todos os arquivos como apagados, `LEIA.md` adicionado). Nada foi perdido: o commit seguinte refez o índice a partir dos arquivos. Reproduzido contra um repositório isca: sem a correção, o índice dela ficou com `.gitignore .gitleaks.toml LEIA.md`; com a correção, vazio. Corrigido com `unset $(git rev-parse --local-env-vars)` no início do teste, e um caso novo confere a checagem com `GIT_DIR` de outro repositório no ambiente.
+- 2026-11-08: `docs/SECURITY.md` escrito. Estado das configurações do GitHub conferido com `gh api`: secret scanning e push protection ligados; Dependabot alerts (404 em `vulnerability-alerts`), security updates e private vulnerability reporting desligados. Os três ficam como passo do humano.
+- 2026-11-08: `AGENTS.md` aponta para `docs/SECURITY.md`; a skill `executar` ganhou a regra de dependência nova e a de exceção com prazo.
 
 ## Log de decisões
 
@@ -90,5 +92,7 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - **D9. zizmor offline no `verify.sh` e online num passo próprio do CI**: o `verify.sh` instala dependências de terceiros (com script de instalação, como o esbuild); um `GH_TOKEN` no ambiente dele ficaria ao alcance desses scripts. Por isso o token vai só no passo `zizmor com as auditorias online`, que roda antes de qualquer instalação. Local, o `verify.sh` roda offline e não precisa de token. A política padrão do zizmor 1.32 já exige SHA para toda action, então não há `zizmor.yml`.
 - **D10. Só regras `deny` de `Read`, sem `Bash(cat ...)` e sem ligar o sandbox**: pela documentação do Claude Code, um `Read(...)` em `deny` também vale para os comandos de arquivo reconhecidos no Bash e para redirecionamentos, então uma regra por caminho cobre as duas formas (o teste confirmou). Regras `Bash(cat ...)` seriam contornadas por qualquer outro comando. Ligar o sandbox fecharia o furo dos scripts, mas muda rede e execução de toda sessão: ficou como sugestão de próxima tarefa.
 - **D11. Teste de segredos corrigido** (regra do `executar`: teste errado é corrigido e registrado): o `segredos-check.test.sh` não isolava o ambiente do git. O comportamento testado não mudou; o teste só deixou de mexer no repositório de verdade.
+- **D12. Dependências novas desta tarefa, conferidas** (a regra que esta tarefa põe na skill `executar`): gitleaks 8.30.1 (`gitleaks/gitleaks`, release de 2026-03-21), osv-scanner 2.7.0 (`google/osv-scanner`, 2026-10-12, o mise verificou a SLSA provenance na instalação), zizmor 1.32.0 (`zizmorcore/zizmor`, 2026-11-02), actionlint 1.7.12 (`rhysd/actionlint`, 2026-03-30), todos pelo backend `aqua` do mise, que baixa a release oficial do repositório. minimatch 11.0.4 (`isaacs/minimatch`, mantido por isaacs) já era dependência transitiva; só a versão mudou. Todas com mais de 3 dias.
+- **D13. Datas das exceções**: a execução atravessou a meia-noite e o dia virou 2026-11-08. A exceção do deepmerge, criada em 2026-11-07 com prazo até 2026-12-07, segue dentro dos 30 dias.
 
 ## Perguntas em aberto

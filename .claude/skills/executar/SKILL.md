@@ -45,6 +45,8 @@ Daqui em diante, trabalhe só dentro de `.worktrees/<slug>`.
 - Toda decisão técnica dentro do escopo: tome, e registre em "Log de decisões" com o motivo.
 - O que estiver em "Fora de escopo" não é feito, mesmo que pareça útil. Se achar algo importante fora do escopo, anote em "Log de progresso" como sugestão de próxima tarefa.
 - Rode `scripts/verify.sh` antes de cada push (o hook de pre-push também roda). O commit é livre. Nunca use `git push --no-verify`.
+- Dependência nova (biblioteca, plugin do Maven, action, ferramenta no `mise.toml`): antes de instalar, confira no registro (`pnpm view <pacote>`, Maven Central, GitHub) que o pacote é o esperado. Registre no log de decisões o motivo e a confirmação: nome exato, autor ou organização, repositório de origem. Nome parecido com o de um pacote conhecido, autor desconhecido ou repositório que não bate: não instale. Versão publicada há menos de 3 dias não entra.
+- Exceção de segurança (vulnerabilidade em `osv-scanner.toml`, falso positivo em `.gitleaks.toml`): só quando corrigir não é possível agora, nas regras de `docs/SECURITY.md`. Registre o motivo no log de decisões. Exceção de vulnerabilidade tem prazo de no máximo 30 dias a partir do dia em que é criada.
 
 Todo código é escrito no ciclo abaixo (Extreme Programming), em passos pequenos.
 
