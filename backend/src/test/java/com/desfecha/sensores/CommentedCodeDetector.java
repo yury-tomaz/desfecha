@@ -31,6 +31,9 @@ final class CommentedCodeDetector {
         i = end;
       } else if (source.startsWith("/*", i)) {
         int end = endOf(source, i + 2, "*/");
+        if (!isJavadoc(source, i)) {
+          addBlockLines(comments, line, source.substring(i + 2, end));
+        }
         line += count(source, i, end, '\n');
         i = end;
       } else if (source.startsWith("\"\"\"", i)) {
@@ -47,6 +50,18 @@ final class CommentedCodeDetector {
       }
     }
     return comments;
+  }
+
+  private static boolean isJavadoc(String source, int start) {
+    return source.startsWith("/**", start) && !source.startsWith("/**/", start);
+  }
+
+  private static void addBlockLines(List<Comment> comments, int firstLine, String body) {
+    String[] bodyLines = body.split("\n", -1);
+    for (int offset = 0; offset < bodyLines.length; offset++) {
+      String text = bodyLines[offset].replaceFirst("\\*/$", "").replaceFirst("^\\s*\\*", "");
+      comments.add(new Comment(firstLine + offset, text));
+    }
   }
 
   private static int endOfLine(String source, int from) {

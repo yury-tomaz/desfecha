@@ -48,4 +48,34 @@ class CommentedCodeDetectorTest {
 
     assertThat(CommentedCodeDetector.lines(source)).isEmpty();
   }
+
+  @Test
+  void flagsEachCodeLineInsideBlockComment() {
+    String source =
+        """
+        class A {
+          /*
+           * Explica o motivo.
+           * int total = 0;
+           */
+          /* return total; */
+        }
+        """;
+
+    assertThat(CommentedCodeDetector.lines(source)).containsExactly(4, 6);
+  }
+
+  @Test
+  void ignoresJavadocExamples() {
+    String source =
+        """
+        /**
+         * Exemplo de uso:
+         * <pre>{@code var a = A.of(1);}</pre>
+         */
+        class A {}
+        """;
+
+    assertThat(CommentedCodeDetector.lines(source)).isEmpty();
+  }
 }
