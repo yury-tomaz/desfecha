@@ -108,6 +108,41 @@ for s in "Problema" "Solução" "Protótipo" "Rabbit holes" "No-gos" "Revisão d
   confere 1 "pitch sem a seção $s falha"
 done
 
+for e in shaping apostado em-build bloqueado entregue; do
+  base
+  troca "$pitch/pitch.md" "Estado: apostado" "Estado: $e"
+  [ "$e" = bloqueado ] && pergunta "$pitch/pitch.md"
+  [ "$e" = entregue ] && escopo linha-do-tempo descendo x
+  confere 0 "pitch em $e passa"
+done
+
+base
+troca "$pitch/pitch.md" "Estado: apostado" "Estado: pronto"
+confere 1 "estado inválido falha"
+
+base
+troca "$pitch/pitch.md" "Estado: apostado" ""
+confere 1 "pitch sem a linha Estado falha"
+
+base
+troca "$pitch/pitch.md" "Apetite: grande" "Apetite: médio"
+confere 1 "apetite inválido falha"
+
+base
+troca "$pitch/pitch.md" "Apetite: grande" ""
+confere 1 "pitch sem a linha Apetite falha"
+
+base
+rm -rf "$pitch/escopos"
+troca "$pitch/pitch.md" "Estado: apostado" "Estado: shaping"
+troca "$pitch/pitch.md" "Apetite: grande" "Apetite: a definir"
+confere 0 "apetite a definir no shaping passa"
+
+base
+rm -rf "$pitch/escopos"
+troca "$pitch/pitch.md" "Apetite: grande" "Apetite: a definir"
+confere 1 "apetite a definir fora do shaping falha"
+
 if [ "$falhas" -gt 0 ]; then
   echo "$falhas caso(s) de plan-check falharam. Corrija scripts/plan-check.sh, não os casos."
   exit 1

@@ -8,6 +8,8 @@ secoes_do_pitch=("Problema" "Solução" "Protótipo" "Rabbit holes" "No-gos" "Re
 
 has_section() { grep -qxF "## $2" "$1"; }
 
+linha() { grep -m1 -E "^$2: " "$1" | sed "s/^$2: //" || true; }
+
 confere_pitch() {
   local dir=${1%/} md=${1%/}/pitch.md
   local errors=()
@@ -15,6 +17,20 @@ confere_pitch() {
   if [ ! -f "$md" ]; then
     errors+=("Falta $md. Crie a partir do formato de docs/PLANS.md.")
   else
+    local estado apetite
+    estado=$(linha "$md" Estado)
+    apetite=$(linha "$md" Apetite)
+    case "$estado" in
+      shaping | apostado | em-build | bloqueado | entregue) ;;
+      "") errors+=("pitch.md: falta a linha 'Estado: <valor>' logo abaixo do título. Valores: shaping, apostado, em-build, bloqueado, entregue.") ;;
+      *) errors+=("pitch.md: estado inválido '$estado'. Valores: shaping, apostado, em-build, bloqueado, entregue.") ;;
+    esac
+    case "$apetite" in
+      pequeno | grande) ;;
+      "a definir") [ "$estado" = shaping ] || errors+=("pitch.md: 'Apetite: a definir' só vale no shaping. Defina pequeno ou grande com o humano antes da aposta.") ;;
+      "") errors+=("pitch.md: falta a linha 'Apetite: <valor>' abaixo do Estado. Valores: pequeno, grande, a definir.") ;;
+      *) errors+=("pitch.md: apetite inválido '$apetite'. Valores: pequeno, grande, a definir.") ;;
+    esac
     for s in "${secoes_do_pitch[@]}"; do
       has_section "$md" "$s" || errors+=("pitch.md: falta a seção '## $s'. Acrescente o título, mesmo que vazia no shaping.")
     done
