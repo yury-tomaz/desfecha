@@ -4,6 +4,10 @@
 
 Este arquivo é um mapa, não um manual. O que dá para descobrir lendo o código não é repetido aqui.
 
+## Fase atual
+
+Base do harness. Não proponha tarefas de produto até a base estar pronta: o humano decide quando a fase muda.
+
 ## Onde está cada coisa
 
 - `docs/PRODUCT_SENSE.md`: por que o produto existe e o que é "bom" aqui. Leia antes de decisões de produto ou de modelagem.
