@@ -1,6 +1,6 @@
 # Segurança base: segredos e cadeia de suprimentos
 
-Status: refinado
+Status: em-execucao
 
 ## Objetivo
 
@@ -62,6 +62,7 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - 2026-11-07: exec-plan criado.
 - 2026-11-07: sugestão de próxima tarefa: segurança parte 2 (CodeQL, scan de imagem Docker, Dockerfile sem root e imagem base por digest, checklist de segurança na skill `revisar`).
 - 2026-11-07: refinado e aprovado.
+- 2026-11-07: execução iniciada.
 
 ## Log de decisões
 
