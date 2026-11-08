@@ -1,6 +1,6 @@
 # Lacunas do fluxo
 
-Estado: apostado
+Estado: em-build
 Apetite: pequeno
 
 ## Problema
