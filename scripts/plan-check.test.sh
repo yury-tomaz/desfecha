@@ -171,6 +171,72 @@ troca "$pitch/pitch.md" "Estado: apostado" "Estado: bloqueado"
 pergunta "$pitch/escopos/linha-do-tempo.md"
 confere 0 "pitch bloqueado com a pergunta no escopo passa"
 
+base
+escopo historico descendo
+confere 0 "escopo descendo passa"
+
+base
+troca "$pitch/escopos/linha-do-tempo.md" "Colina: subindo" ""
+confere 1 "escopo sem a linha Colina falha"
+
+base
+troca "$pitch/escopos/linha-do-tempo.md" "Colina: subindo" "Colina: no topo"
+confere 1 "escopo com colina inválida falha"
+
+for s in "Objetivo" "Critérios de aceite" "Log de progresso" "Log de decisões" "Perguntas em aberto"; do
+  base
+  remove_secao "$pitch/escopos/linha-do-tempo.md" "$s"
+  confere 1 "escopo sem a seção $s falha"
+done
+
+base
+esvazia_secao "$pitch/escopos/linha-do-tempo.md" "Critérios de aceite"
+confere 1 "escopo sem critérios de aceite falha"
+
+base
+troca "$pitch/escopos/linha-do-tempo.md" "- \[ \] " ""
+confere 1 "escopo com critério fora do formato - [ ] falha"
+
+base
+troca "$pitch/pitch.md" "Apetite: grande" "Apetite: pequeno"
+confere 0 "apetite pequeno com 1 escopo passa"
+
+base
+troca "$pitch/pitch.md" "Apetite: grande" "Apetite: pequeno"
+escopo historico subindo
+confere 1 "apetite pequeno com 2 escopos falha"
+
+base
+escopo b subindo
+escopo c subindo
+escopo d subindo
+confere 0 "apetite grande com 4 escopos passa"
+
+base
+escopo b subindo
+escopo c subindo
+escopo d subindo
+escopo e subindo
+confere 1 "apetite grande com 5 escopos falha"
+
+base
+troca "$pitch/pitch.md" "Estado: apostado" "Estado: shaping"
+troca "$pitch/pitch.md" "Apetite: grande" "Apetite: a definir"
+confere 1 "apetite a definir com escopo falha"
+
+base
+troca "$pitch/pitch.md" "Estado: apostado" "Estado: entregue"
+confere 1 "pitch entregue com critério não marcado falha"
+
+base
+rm -rf "$pitch/escopos"
+troca "$pitch/pitch.md" "Estado: apostado" "Estado: entregue"
+confere 1 "pitch entregue sem escopos falha"
+
+base
+rm -f "$pitch/pitch.md"
+confere 1 "pasta sem pitch.md falha"
+
 if [ "$falhas" -gt 0 ]; then
   echo "$falhas caso(s) de plan-check falharam. Corrija scripts/plan-check.sh, não os casos."
   exit 1

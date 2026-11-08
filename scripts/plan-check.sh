@@ -5,6 +5,7 @@
 set -euo pipefail
 
 secoes_do_pitch=("Problema" "Solução" "Protótipo" "Rabbit holes" "No-gos" "Revisão do protótipo" "Log de decisões" "Perguntas em aberto")
+secoes_do_escopo=("Objetivo" "Critérios de aceite" "Log de progresso" "Log de decisões" "Perguntas em aberto")
 secoes_preenchidas_apos_shaping=("Problema" "Solução" "Protótipo" "Rabbit holes" "No-gos" "Revisão do protótipo")
 
 has_section() { grep -qxF "## $2" "$1"; }
@@ -26,6 +27,29 @@ perguntas_em_aberto() {
     [ -f "$f" ] && total=$((total + $(section_lines "$f" "Perguntas em aberto")))
   done
   echo "$total"
+}
+
+criterios() { awk -v marca="$2" '$0 == "## Critérios de aceite" { i = 1; next } /^## / { i = 0 } i && index($0, "- [" marca "] ") == 1 { n++ } END { print n + 0 }' "$1"; }
+
+# Acrescenta ao array errors de confere_pitch, que é quem chama.
+confere_escopo() {
+  local f=$1 estado=$2 nome colina s
+  nome="escopos/$(basename "$f")"
+  colina=$(linha "$f" Colina)
+  case "$colina" in
+    subindo | descendo) ;;
+    "") errors+=("$nome: falta a linha 'Colina: subindo' ou 'Colina: descendo' logo abaixo do título.") ;;
+    *) errors+=("$nome: colina inválida '$colina'. Valores: subindo (ainda descobrindo como fazer), descendo (já se sabe o que falta).") ;;
+  esac
+  for s in "${secoes_do_escopo[@]}"; do
+    has_section "$f" "$s" || errors+=("$nome: falta a seção '## $s'.")
+  done
+  if has_section "$f" "Critérios de aceite" && [ $(($(criterios "$f" " ") + $(criterios "$f" x))) -eq 0 ]; then
+    errors+=("$nome: '## Critérios de aceite' precisa de itens no formato '- [ ] ...', cada um dizendo como é comprovado.")
+  fi
+  if [ "$estado" = entregue ] && [ "$(criterios "$f" " ")" -gt 0 ]; then
+    errors+=("$nome: pitch entregue com critério de aceite não marcado. Verifique e marque '- [x]', ou volte o pitch para em-build.")
+  fi
 }
 
 confere_pitch() {
@@ -65,6 +89,25 @@ confere_pitch() {
     if [ "$estado" = bloqueado ] && [ "$perguntas" -eq 0 ]; then
       errors+=("Pitch bloqueado sem pergunta em aberto. Escreva em '## Perguntas em aberto' (do pitch ou do escopo) o que o humano precisa decidir, com a sua recomendação.")
     fi
+
+    local escopos=() f
+    for f in "$dir"/escopos/*.md; do [ -f "$f" ] && escopos+=("$f"); done
+    local limite
+    case "$apetite" in
+      pequeno) limite=1 ;;
+      grande) limite=4 ;;
+      *) limite=0 ;;
+    esac
+    if [ ${#escopos[@]} -gt "$limite" ]; then
+      errors+=("${#escopos[@]} escopos para apetite '$apetite', que permite $limite. Circuit breaker: não crie escopo além do apetite. Marque o pitch como bloqueado e descreva o que sobrou em '## Perguntas em aberto' (docs/PLANS.md).")
+    fi
+    if [ "$estado" = entregue ] && [ ${#escopos[@]} -eq 0 ]; then
+      errors+=("Pitch entregue sem escopos. Um pitch só é entregue depois de pelo menos um escopo construído em escopos/.")
+    fi
+
+    for f in ${escopos[@]+"${escopos[@]}"}; do
+      confere_escopo "$f" "$estado"
+    done
   fi
 
   if [ ${#errors[@]} -gt 0 ]; then
