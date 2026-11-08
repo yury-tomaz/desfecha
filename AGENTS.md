@@ -11,6 +11,7 @@ Este arquivo é um mapa, não um manual. O que dá para descobrir lendo o códig
 - `docs/exec-plans/active/`: tarefas em andamento. Comece por aqui.
 - `docs/exec-plans/completed/`: tarefas concluídas, com o histórico de decisões.
 - `.claude/skills/refinar` e `.claude/skills/executar`: como um plano é refinado e executado.
+- `.claude/skills/revisar`: como um PR é revisado.
 - `scripts/plan-check.sh <plano>`: verifica se um plano tem a estrutura mínima.
 - `backend/`: Spring Boot (Maven Wrapper). `frontend/`: SvelteKit com TypeScript.
 

@@ -41,10 +41,42 @@ Daqui em diante, trabalhe só dentro de `.worktrees/<slug>`.
 ## 5. Executar
 
 - Siga os passos do plano. Marque cada passo `- [x]` ao concluir.
-- Atualize o log de progresso durante o trabalho, não só no fim. Faça commits pequenos no branch.
+- Atualize o log de progresso durante o trabalho, não só no fim.
 - Toda decisão técnica dentro do escopo: tome, e registre em "Log de decisões" com o motivo.
 - O que estiver em "Fora de escopo" não é feito, mesmo que pareça útil. Se achar algo importante fora do escopo, anote em "Log de progresso" como sugestão de próxima tarefa.
-- Se existir comando de verificação no `AGENTS.md`, rode-o antes de cada commit.
+- Rode `scripts/verify.sh` antes de cada commit. Nunca use `git commit --no-verify`.
+
+Todo código é escrito no ciclo abaixo (Extreme Programming), em passos pequenos.
+
+### 5.1 Vermelho (TDD)
+
+- Cada critério de aceite vira pelo menos um teste. Comece de fora para dentro: primeiro o teste de comportamento, depois testes de unidade se precisar.
+- Um teste por vez. Rode e veja falhar **pelo motivo certo**: a asserção falha. Erro de compilação ou de configuração não conta.
+- Teste o comportamento pela API pública, não a implementação. Mock só na fronteira externa (APIs de terceiros), nunca do que é nosso.
+- O nome do teste descreve o comportamento.
+- Nunca altere um teste para fazê-lo passar. Se o teste estava errado, corrija e registre no log de decisões.
+- Bug encontrado: primeiro um teste que o reproduz.
+- O que não dá para testar com código (Dockerfile, CI, configuração) é verificado pelo comando que o critério de aceite indica.
+
+### 5.2 Verde
+
+- Escreva o mínimo de código para o teste passar. Nada de "já que estou aqui".
+- Nenhum código de produção sem um teste falhando que o peça.
+- Commit a cada ciclo verde, com a mensagem descrevendo o comportamento.
+- Se travar (o mesmo teste falhando depois de 3 tentativas), pare e dê um passo menor. Se ainda assim não sair, vá para a seção 6 (Bloqueio).
+
+### 5.3 Refactoring
+
+- Só com tudo verde, e sem mudar comportamento: os testes não mudam.
+- Siga as 4 regras do design simples, em ordem: passa nos testes; revela a intenção; não tem duplicação; tem o menor número de elementos possível.
+- Na prática: nomes melhores, extrair funções, remover duplicação, apagar código morto, aplicar a regra de comentários abaixo.
+- Rode `scripts/verify.sh` e faça um commit separado (`refactor: ...`).
+
+### Regra de comentários
+
+- Comentário só explica o **porquê** que o código não consegue dizer: regra de negócio não óbvia, restrição externa, contorno de bug (com link), decisão que parece errada mas é intencional.
+- Proibido: descrever o que o código faz; narrar intenção ou pensamento ("aqui vamos...", "agora precisamos..."); histórico de mudança ("alterado para...", "antes era..."), que é papel do git; código comentado; TODO sem tarefa associada.
+- No refactoring, todo comentário é candidato a sair. Se um nome melhor ou uma função extraída diz o mesmo, troque.
 
 ## 6. Bloqueio
 
