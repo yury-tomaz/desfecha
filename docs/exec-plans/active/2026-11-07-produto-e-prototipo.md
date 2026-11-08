@@ -1,6 +1,6 @@
 # Produto e protótipo: onde as definições moram
 
-Status: refinado
+Status: em-execucao
 
 ## Objetivo
 
@@ -61,6 +61,7 @@ Hoje o produto cabe num arquivo só (`docs/PRODUCT_SENSE.md`) e não existe luga
 - 2026-11-07: rascunho criado.
 - 2026-11-08: refinado e aprovado.
 - 2026-11-08: `seguranca-base` concluído e no `main` (PR #3). Contexto atualizado com o que ele deixou e com o motivo de `prototipo/` ficar na raiz, que tinha ficado só na conversa do refinamento. Critério novo, aprovado pelo humano: a checagem do protótipo sem dependências entra na tabela "Camadas" do `docs/SECURITY.md`, porque é lá que se procura onde está cada defesa de cadeia de suprimentos.
+- 2026-11-08: execução iniciada.
 
 ## Log de decisões
 
