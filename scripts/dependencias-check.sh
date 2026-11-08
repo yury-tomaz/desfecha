@@ -26,6 +26,6 @@ if ! osv-scanner scan source --config osv-scanner.toml \
   -L "osv-scanner:$resolvidas" -L frontend/pnpm-lock.yaml; then
   echo >&2
   echo "Vulnerabilidade conhecida numa biblioteca (tabela acima; $resolvidas é a árvore resolvida do backend/pom.xml)." >&2
-  echo "Como corrigir: atualize a biblioteca para a versão da coluna FIXED VERSION (no frontend, pnpm update <pacote>, ou overrides em frontend/pnpm-workspace.yaml se ela for transitiva; no backend, a versão no pom.xml ou uma propriedade do parent). Se não houver versão corrigida, registre uma exceção em osv-scanner.toml com reason e ignoreUntil de no máximo 30 dias, e o motivo no log de decisões do plano (regras em docs/SECURITY.md)." >&2
+  echo "Como corrigir: atualize a biblioteca para a versão da coluna FIXED VERSION (no frontend, pnpm update <pacote>, ou overrides em frontend/pnpm-workspace.yaml se ela for transitiva; no backend, a versão no pom.xml ou uma propriedade do parent). Se não houver versão corrigida, registre uma exceção em osv-scanner.toml com reason e ignoreUntil de no máximo 30 dias, e o motivo no log de decisões do escopo (regras em docs/SECURITY.md)." >&2
   exit 1
 fi

@@ -4,7 +4,7 @@
   <module name="TreeWalker">
     <module name="TodoComment">
       <property name="format" value="(TODO|FIXME)(?!\(\d{4}-\d{2}-\d{2}-[a-z0-9]+(-[a-z0-9]+)*\): )"/>
-      <message key="todo.match" value="TODO ou FIXME sem exec-plan. Escreva no formato TODO(&lt;slug-do-plano&gt;): texto, com o nome do arquivo do plano sem .md (ex.: TODO(2026-11-07-sensores-computacionais): ...), ou apague o comentário."/>
+      <message key="todo.match" value="TODO ou FIXME sem pitch. Escreva no formato TODO(&lt;pasta-do-pitch&gt;): texto, com o nome da pasta do pitch em docs/pitches (ex.: TODO(2026-11-08-sensores-de-teste): ...), ou apague o comentário."/>
     </module>
   </module>
 </module>

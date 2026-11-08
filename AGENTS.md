@@ -13,12 +13,13 @@ Base do harness. Não proponha tarefas de produto até a base estar pronta: o hu
 - `docs/PRODUCT_SENSE.md`: por que o produto existe e o que é "bom" aqui. Leia antes de decisões de produto ou de modelagem.
 - `docs/produto/`: um arquivo por tema de produto, com o estado atual, as decisões e as perguntas em aberto. O índice está no `PRODUCT_SENSE.md`.
 - `docs/SECURITY.md`: ameaças cobertas e não cobertas, onde está cada checagem, como registrar uma exceção. Leia antes de adicionar dependência ou quando uma checagem de segurança falhar.
-- `docs/PLANS.md`: como o trabalho é planejado e registrado.
-- `docs/exec-plans/active/`: tarefas em andamento. Comece por aqui.
-- `docs/exec-plans/completed/`: tarefas concluídas, com o histórico de decisões.
-- `.claude/skills/refinar` e `.claude/skills/executar`: como um plano é refinado e executado.
+- `docs/PLANS.md`: o processo (Shape Up adaptado): pitch, aposta, escopos, apetite e circuit breaker.
+- `docs/pitches/`: um pitch por pasta, com o estado no `pitch.md` e os escopos em `escopos/`. Comece por aqui.
+- `docs/referencias/`: as referências do harness e do processo, com o que usamos de cada uma.
+- `docs/historico/exec-plans/`: as tarefas do começo do harness, no formato anterior aos pitches.
+- `.claude/skills/moldar` e `.claude/skills/executar`: como um pitch ganha forma e é apostado, e como é construído.
 - `.claude/skills/revisar`: como um PR é revisado.
-- `scripts/plan-check.sh <plano>`: verifica se um plano tem a estrutura mínima.
+- `scripts/plan-check.sh [pasta-do-pitch]`: verifica a estrutura de pitch e escopos (sem argumento, de todos).
 - `prototipo/`: protótipo navegável da plataforma, em HTML, CSS e JS puros, sem build nem dependências. Vai na frente do `frontend/`, que não importa nada dele. Leia `prototipo/README.md` antes de mexer.
 - `backend/`: Spring Boot (Maven Wrapper). `frontend/`: SvelteKit com TypeScript.
 

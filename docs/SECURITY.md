@@ -13,7 +13,7 @@ Todo o código daqui é escrito por agentes. Esta base cobre os riscos que mais 
 | Pacote recém-publicado e comprometido | pnpm só instala versão com 3 dias ou mais; Dependabot com o mesmo cooldown |
 | Pacote republicado com procedência pior (ex.: sem provenance depois de ter) | `trustPolicy: no-downgrade` no pnpm |
 | Dependência vinda de git ou URL, fora do registro | `blockExoticSubdeps` no pnpm |
-| Pacote com nome inventado pelo agente | toda dependência nova vai para o log de decisões do plano, com nome, autor e repositório conferidos (skill `executar`) |
+| Pacote com nome inventado pelo agente | toda dependência nova vai para o log de decisões do escopo, com nome, autor e repositório conferidos (skill `executar`) |
 | Action do GitHub com tag reescrita por atacante | toda action fixada pelo SHA completo; zizmor e actionlint no `verify.sh` |
 | Workflow com permissão demais ou token persistido | `permissions: contents: read` e `persist-credentials: false`, conferidos pelo zizmor |
 | Agente lê `.env` ou credenciais da máquina | regras `deny` em `.claude/settings.json` |
@@ -49,7 +49,7 @@ O gitleaks varre os arquivos versionados e os novos que o git não ignora (o que
 
 ## Exceções
 
-Quem executa um plano pode criar uma exceção sozinho, desde que registre o motivo no log de decisões do plano. Antes de criar, tente corrigir: atualizar a biblioteca, ou tirar o segredo do código.
+Quem constrói um escopo pode criar uma exceção sozinho, desde que registre o motivo no log de decisões do escopo. Antes de criar, tente corrigir: atualizar a biblioteca, ou tirar o segredo do código.
 
 ### Vulnerabilidade de biblioteca (`osv-scanner.toml`)
 

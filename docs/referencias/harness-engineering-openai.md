@@ -15,7 +15,7 @@ Antes de apoiar uma decisão num detalhe que só aparece aqui, confira no origin
 - Um time pequeno entregou um produto inteiro sem código escrito por humano: os agentes escrevem, os humanos dirigem.
 - **`AGENTS.md` como mapa:** um arquivo curto (cerca de 100 linhas), que funciona como índice e aponta para uma árvore `docs/` estruturada, em vez de ser um manual.
 - **`docs/` como fonte de verdade:** arquitetura, documentos de design, especificações de produto, referências e políticas de qualidade e segurança ficam no repositório. O que o agente não acha no repositório, para ele, não existe.
-- **Planos de execução versionados:** os planos são artefatos de primeira classe, guardados no repositório (`docs/exec-plans/`, com `active/` e `completed/`, e um registro de dívida técnica).
+- **Planos de execução versionados:** os planos são artefatos de primeira classe, guardados no repositório, numa pasta de planos dentro de `docs/`, separados em ativos e concluídos, ao lado de um registro de dívida técnica.
 - **Regras conferidas por máquina:** linters próprios e testes estruturais impõem as invariantes de arquitetura. A mensagem de erro do lint traz a correção, para o agente seguir.
 - **Coleta de lixo recorrente:** agentes em segundo plano procuram desvio de padrão e documentação desatualizada, e abrem PRs pequenos de correção. Feedback humano que se repete deixa de ser documento e vira regra em código.
 
