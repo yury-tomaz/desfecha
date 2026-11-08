@@ -1,6 +1,6 @@
 ---
 name: revisar
-description: Revisa um pull request contra o exec-plan e as dimensões de uma revisão de dev experiente, e publica os achados como comentário no PR. Use quando um PR for aberto ou atualizado.
+description: Revisa um pull request contra o pitch e o escopo e as dimensões de uma revisão de dev experiente, e publica os achados como comentário no PR. Use quando um PR for aberto ou atualizado.
 disable-model-invocation: true
 ---
 
@@ -22,15 +22,15 @@ Se o PR já tem uma revisão sua (`gh pr view <n> --json reviews,comments`), é 
 
 1. `gh pr view <n>` e `gh pr diff <n>`. Faça checkout do branch do PR (`gh pr checkout <n>`) para ler o código completo, não só o diff.
 2. Leia `AGENTS.md` e `docs/PRODUCT_SENSE.md`.
-3. Encontre o exec-plan da tarefa (citado na descrição do PR ou alterado no diff, em `docs/exec-plans/`). Leia objetivo, critérios de aceite, fora de escopo e os logs.
+3. Encontre o pitch e o escopo do PR (citados na descrição do PR ou alterados no diff, em `docs/pitches/<pasta>/`). Leia o `pitch.md` (problema, solução, rabbit holes, no-gos) e o escopo (objetivo, critérios de aceite e os logs).
 4. Para cada arquivo alterado, leia também o código ao redor: quem chama, quem é chamado, testes existentes. Bug costuma estar na interação, não na linha alterada.
 
-Sem exec-plan, revise só o código e registre isso como achado 🟠 (todo trabalho anda por tarefa, ver `docs/PLANS.md`).
+Sem pitch e escopo, revise só o código e registre isso como achado 🟠 (todo trabalho anda por pitch, ver `docs/PLANS.md`).
 
-## 2. Revisar contra o plano
+## 2. Revisar contra o pitch e o escopo
 
 - Cada critério de aceite tem evidência de verificação (teste, comando, registro no log de progresso)? Critério marcado `[x]` sem evidência é achado.
-- Algo do "Fora de escopo" entrou no diff?
+- Algo dos no-gos do pitch entrou no diff?
 - O log de progresso e o log de decisões refletem o que foi feito? Decisão relevante sem registro é achado.
 - `AGENTS.md` continua verdadeiro depois da mudança (comandos, caminhos)?
 
@@ -90,7 +90,7 @@ Percorra as dimensões abaixo. Correção, segurança e domínio vêm antes de t
 - Arquivos e funções de tamanho compreensível.
 
 **Tamanho do PR**
-- Grande demais para revisar com qualidade? Achado para o plano (devia ter sido dividido).
+- Grande demais para revisar com qualidade? Achado para o escopo (devia ter sido dividido).
 
 ## 4. Verificar antes de reportar
 
@@ -129,7 +129,7 @@ Formato do comentário:
 
 🔴 <n> · 🟠 <n> · 🟢 <n> · 💬 <n> · ℹ️ <n>
 
-**Plano:** <caminho do exec-plan, ou "não encontrado">
+**Escopo:** <caminho do escopo em docs/pitches/, ou "não encontrado">
 
 ### Revisão anterior
 - ✅ <título do achado anterior> — <evidência>
