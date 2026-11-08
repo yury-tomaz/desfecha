@@ -1,3 +1,9 @@
 engineStrict: true
 onlyBuiltDependencies:
   - esbuild
+# Versão publicada há menos de 3 dias (em minutos) não instala: dá tempo de um pacote comprometido ser retirado.
+minimumReleaseAge: 4320
+trustPolicy: no-downgrade
+blockExoticSubdeps: true
+overrides:
+  minimatch: 11.0.4

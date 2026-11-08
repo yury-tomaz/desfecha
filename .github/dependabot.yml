@@ -1,0 +1,21 @@
+# Cooldown de 3 dias, o mesmo minimumReleaseAge de frontend/pnpm-workspace.yaml: o Dependabot não propõe versão que o pnpm recusaria.
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /backend
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3

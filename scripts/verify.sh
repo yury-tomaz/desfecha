@@ -10,6 +10,24 @@ step() { printf '\n==> %s\n' "$1"; }
 step "harness: casos do hook que bloqueia git push --no-verify"
 mise exec -- .claude/hooks/bloqueia-push-no-verify.test.sh
 
+step "segredos: casos da checagem"
+mise exec -- scripts/segredos-check.test.sh
+
+step "segredos: arquivos versionados e novos (gitleaks)"
+mise exec -- scripts/segredos-check.sh
+
+step "dependências: casos da checagem de exceções"
+scripts/dependencias-excecoes-check.test.sh
+
+step "dependências: vulnerabilidades conhecidas (OSV-Scanner)"
+mise exec -- scripts/dependencias-check.sh
+
+step "workflows: actionlint e zizmor"
+if ! mise exec -- actionlint || ! mise exec -- zizmor --offline --no-progress .github/workflows; then
+  echo "Como corrigir: siga o help de cada achado acima. Toda action vai fixada pelo SHA completo do commit com a tag em comentário (uses: dono/action@<sha de 40 caracteres> # v1.2.3; o SHA sai de gh api repos/<dono>/<action>/commits/<tag> --jq .sha), o workflow declara permissions mínimas e o checkout usa persist-credentials: false (regras em docs/SECURITY.md)." >&2
+  exit 1
+fi
+
 step "backend: build, testes e formatação (mvnw verify)"
 mise exec -- ./backend/mvnw -B -q -f backend/pom.xml verify
 

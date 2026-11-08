@@ -1,0 +1,6 @@
+# Configuração do gitleaks, rodado por scripts/segredos-check.sh.
+# Exceção só para falso positivo: um bloco [[allowlists]] com description dizendo por que não é segredo.
+# Comentários gitleaks:allow e .gitleaksignore não valem. Regras em docs/SECURITY.md.
+
+[extend]
+useDefault = true

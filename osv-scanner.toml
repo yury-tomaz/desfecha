@@ -1,0 +1,7 @@
+# Exceções de vulnerabilidade do OSV-Scanner, conferidas por scripts/dependencias-excecoes-check.sh.
+# Só blocos [[IgnoredVulns]] com id, reason e ignoreUntil de no máximo 30 dias. Regras em docs/SECURITY.md.
+
+[[IgnoredVulns]]
+id = "GHSA-gcqx-w48m-w2h4"
+ignoreUntil = 2026-12-07
+reason = "deepmerge 4.3.1 não tem versão corrigida. Entra só no build, pelo @sveltejs/vite-plugin-svelte, mesclando configuração nossa, sem entrada de usuário."

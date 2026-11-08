@@ -11,6 +11,7 @@ Base do harness. Não proponha tarefas de produto até a base estar pronta: o hu
 ## Onde está cada coisa
 
 - `docs/PRODUCT_SENSE.md`: por que o produto existe e o que é "bom" aqui. Leia antes de decisões de produto ou de modelagem.
+- `docs/SECURITY.md`: ameaças cobertas e não cobertas, onde está cada checagem, como registrar uma exceção. Leia antes de adicionar dependência ou quando uma checagem de segurança falhar.
 - `docs/PLANS.md`: como o trabalho é planejado e registrado.
 - `docs/exec-plans/active/`: tarefas em andamento. Comece por aqui.
 - `docs/exec-plans/completed/`: tarefas concluídas, com o histórico de decisões.
