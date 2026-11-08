@@ -1,6 +1,6 @@
 # Sensores de teste: executor no frontend, cobertura e mutação
 
-Estado: apostado
+Estado: em-build
 Apetite: grande
 
 ## Problema
