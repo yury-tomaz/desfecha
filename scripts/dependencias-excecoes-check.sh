@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Confere as exceções de vulnerabilidade do osv-scanner.toml: cada uma com id, motivo e prazo de no máximo 30 dias.
+# Lista do que é permitido: o OSV-Scanner aceita outras formas (tabela inline, PackageOverrides) que não passariam por aqui.
 # Uso: scripts/dependencias-excecoes-check.sh [osv-scanner.toml]
 # HOJE=AAAA-MM-DD troca a data de hoje (usado pelos casos em scripts/dependencias-excecoes-check.test.sh).
 set -euo pipefail
@@ -31,11 +32,20 @@ problemas=$(awk -v hoje="$hoje" '
     else print "linha " NR ": " $0 " não é aceito; só [[IgnoredVulns]], que ignora uma vulnerabilidade e não o pacote inteiro"
     next
   }
-  aberto && /^[ \t]*id[ \t]*=[ \t]*"[^"]+"/ { id = $0; sub(/^[^"]*"/, "", id); sub(/".*$/, "", id) }
-  aberto && /^[ \t]*reason[ \t]*=[ \t]*("[^"]+"|'\''[^'\'']+'\'')/ { motivo = 1 }
-  aberto && /^[ \t]*ignoreUntil[ \t]*=[ \t]*[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][ \t]*(#.*)?$/ {
-    prazo = $0; sub(/^[^=]*=[ \t]*/, "", prazo); prazo = substr(prazo, 1, 10)
+  /^[ \t]*(#.*)?$/ { next }
+  /^[ \t]*[A-Za-z]+[ \t]*=/ {
+    chave = $0; sub(/^[ \t]*/, "", chave); sub(/[ \t]*=.*$/, "", chave)
+    if (!aberto) { print "linha " NR ": " chave " fora de [[IgnoredVulns]] não é aceito"; next }
+    if (chave == "id" && $0 ~ /=[ \t]*"[^"]+"/) { id = $0; sub(/^[^"]*"/, "", id); sub(/".*$/, "", id) }
+    else if (chave == "reason") { if ($0 ~ /=[ \t]*("[^"]+"|'\''[^'\'']+'\'')/) motivo = 1 }
+    else if (chave == "ignoreUntil") {
+      if ($0 ~ /=[ \t]*[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][ \t]*(#.*)?$/) { prazo = $0; sub(/^[^=]*=[ \t]*/, "", prazo); prazo = substr(prazo, 1, 10) }
+      else print "linha " NR ": ignoreUntil precisa ser uma data AAAA-MM-DD sem aspas"
+    }
+    else if (chave != "id") print "linha " NR ": " chave " não é aceito em [[IgnoredVulns]]; só id, ignoreUntil e reason"
+    next
   }
+  { print "linha " NR ": " $0 " não foi entendido; cada chave vai numa linha só" }
   END { fecha() }
 ' "$config")
 

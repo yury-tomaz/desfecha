@@ -100,6 +100,38 @@ ignore = true
 reason = "não usado"
 EOF
 
+confere 1 "IgnoredVulns como tabela inline, sem motivo nem prazo, não é aceito" <<'EOF'
+IgnoredVulns = [{ id = "GHSA-aaaa-bbbb-cccc" }]
+EOF
+
+confere 1 "PackageOverrides como tabela inline não é aceito" <<'EOF'
+PackageOverrides = [{ name = "minimatch", ecosystem = "npm", ignore = true }]
+EOF
+
+confere 1 "chave desconhecida dentro de [[IgnoredVulns]] não é aceita" <<'EOF'
+[[IgnoredVulns]]
+id = "GHSA-aaaa-bbbb-cccc"
+ignoreUntil = 2026-11-20
+reason = "sem versão corrigida"
+ignore = true
+EOF
+
+confere 1 "ignoreUntil fora do formato AAAA-MM-DD sem aspas não é aceito" <<'EOF'
+[[IgnoredVulns]]
+id = "GHSA-aaaa-bbbb-cccc"
+ignoreUntil = "2099-01-01"
+reason = "sem versão corrigida"
+EOF
+
+confere 1 "linha que não é chave, tabela nem comentário não é aceita" <<'EOF'
+[[IgnoredVulns]]
+id = "GHSA-aaaa-bbbb-cccc"
+ignoreUntil = 2026-11-20
+reason = """
+motivo em várias linhas
+"""
+EOF
+
 if [ "$falhas" -gt 0 ]; then
   echo "$falhas caso(s) de dependencias-excecoes-check falharam. Corrija scripts/dependencias-excecoes-check.sh, não os casos."
   exit 1
