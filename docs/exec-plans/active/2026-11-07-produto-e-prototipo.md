@@ -49,12 +49,12 @@ Hoje o produto cabe num arquivo só (`docs/PRODUCT_SENSE.md`) e não existe luga
 
 ## Passos
 
-- [ ] `docs/produto/` com os temas iniciais e as perguntas em aberto movidas
-- [ ] Índice no `PRODUCT_SENSE.md` e checagem do índice e das seções em `scripts/verify.sh`
-- [ ] `prototipo/` com o `index.html` e o documento de propósito e marca
-- [ ] Checagens do protótipo em `scripts/verify.sh` (import pelo `frontend/`, sem dependências) e a linha em "Camadas" do `docs/SECURITY.md`
-- [ ] Pergunta nova na skill `refinar`
-- [ ] `AGENTS.md`
+- [x] `docs/produto/` com os temas iniciais e as perguntas em aberto movidas
+- [x] Índice no `PRODUCT_SENSE.md` e checagem do índice e das seções em `scripts/verify.sh`
+- [x] `prototipo/` com o `index.html` e o documento de propósito e marca
+- [x] Checagens do protótipo em `scripts/verify.sh` (import pelo `frontend/`, sem dependências) e a linha em "Camadas" do `docs/SECURITY.md`
+- [x] Pergunta nova na skill `refinar`
+- [x] `AGENTS.md`
 
 ## Log de progresso
 
@@ -62,7 +62,17 @@ Hoje o produto cabe num arquivo só (`docs/PRODUCT_SENSE.md`) e não existe luga
 - 2026-11-08: refinado e aprovado.
 - 2026-11-08: `seguranca-base` concluído e no `main` (PR #3). Contexto atualizado com o que ele deixou e com o motivo de `prototipo/` ficar na raiz, que tinha ficado só na conversa do refinamento. Critério novo, aprovado pelo humano: a checagem do protótipo sem dependências entra na tabela "Camadas" do `docs/SECURITY.md`, porque é lá que se procura onde está cada defesa de cadeia de suprimentos.
 - 2026-11-08: execução iniciada.
+- 2026-11-08: temas `resolucao`, `integracoes`, `acoes-da-ia` e `lgpd` em `docs/produto/`, com as 4 perguntas movidas. Índice "## Temas" no `PRODUCT_SENSE.md`, com o formato de um tema. `scripts/produto-check.sh` e casos no `verify.sh`.
+- 2026-11-08: `prototipo/` com `index.html`, `estilo.css` e `README.md`. `scripts/prototipo-check.sh` e casos no `verify.sh`; linha em "Camadas" do `docs/SECURITY.md`. O `README.md` disparou a própria checagem (cita `<script src="https://...">`); virou caso de teste e a busca de script remoto ficou só nos arquivos que o navegador carrega.
+- 2026-11-08: skill `refinar` e `AGENTS.md` atualizados. Critérios comprovados no repositório: cada falha provocada (tema fora do índice, link quebrado, tema sem seção, import em `.ts` e em `.svelte`, `package.json`, `<script src="https://...">`) sai com "Como corrigir", e reverter passa. `index.html` aberto por `file://` no Chrome headless, com o CSS aplicado.
 
 ## Log de decisões
+
+- **D1. Checagens em shell (`scripts/<tema>-check.sh` com `.test.sh`), não em regra do ESLint.** A do índice não tem nada a ver com o frontend. A do import precisa olhar `.ts`, `.svelte`, `.css` e a config do Vite de uma vez, e o ESLint não vê `.css`. Um script só por fronteira, `prototipo-check.sh`, cobre os dois lados do protótipo.
+- **D2. O frontend falha com qualquer string que tenha o segmento de caminho `prototipo`, não só com `import`.** Um alias no `vite.config.ts` (`telas: "../prototipo"`) deixaria o import sem o nome da pasta. Texto de interface não cai na regra: a palavra em português tem acento, e a regra pede o segmento inteiro dentro de aspas. `node_modules`, `.svelte-kit` e `build` ficam de fora.
+- **D3. "Script de fora" no protótipo inclui `//host` sem protocolo e `import` de URL em JS**, além de `<script src="http...">`: é a mesma porta de cadeia de suprimentos. A busca olha só `.html`, `.htm`, `.js`, `.mjs` e `.svg`, porque a documentação cita a regra. `<link>` de fonte externa passa, como diz o plano.
+- **D4. Nomes dos temas: `resolucao`, `integracoes`, `acoes-da-ia`, `lgpd`.** "Estado atual" de cada um repete só o que o `PRODUCT_SENSE.md` já dizia; "Decisões" fica "Nenhuma ainda", porque criar decisão está fora de escopo.
+- **D5. O formato de um tema fica documentado no próprio `PRODUCT_SENSE.md`**, junto do índice, e não num `docs/produto/README.md`: ali ele seria um arquivo de `docs/produto/` sem as três seções, e a checagem teria que abrir exceção.
+- **D6. Cores, fontes e espaçamentos, quando definidos, viram variáveis CSS em `prototipo/estilo.css`**, e a decisão vai para um tema em `docs/produto/`. Está no `prototipo/README.md`.
 
 ## Perguntas em aberto
