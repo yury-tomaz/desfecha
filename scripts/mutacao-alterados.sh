@@ -17,9 +17,10 @@ if ! git rev-parse --verify -q origin/main >/dev/null; then
 fi
 
 base=$(git merge-base HEAD origin/main)
-{
-  git diff --name-only --diff-filter=ACMR "$base"
-  git ls-files --others --exclude-standard
-} | grep -E '^(backend/src/main/java/.+\.java|frontend/src/lib/.+\.ts)$' |
-  grep -vE '^backend/src/main/java/com/desfecha/BackendApplication\.java$|\.test\.ts$' |
-  sort -u || true
+alterados=$(git diff --name-only --diff-filter=ACMR "$base" && git ls-files --others --exclude-standard)
+# BackendApplication fica fora como na cobertura: o único código dela é o main(), que nenhum teste chama.
+awk '
+  /^backend\/src\/main\/java\/com\/desfecha\/BackendApplication\.java$/ { next }
+  /\.test\.ts$/ { next }
+  /^backend\/src\/main\/java\/.+\.java$/ || /^frontend\/src\/lib\/.+\.ts$/
+' <<<"$alterados" | sort -u
