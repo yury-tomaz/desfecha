@@ -25,7 +25,6 @@ Todo o código daqui é escrito por agentes. Esta base cobre os riscos que mais 
 - Imagem Docker: scan, usuário sem root, imagem base fixada por digest.
 - Script Node ou Python rodado pelo agente que abre um arquivo de credencial sozinho: as regras `deny` cobrem as ferramentas do Claude Code e os comandos de arquivo que ele reconhece no Bash (`cat`, `head`, `tail`, `sed`...), não qualquer processo. Fechar isso pede o sandbox do Claude Code (`sandbox.enabled`).
 - Segredo que já está no `origin/main`: o gitleaks olha os arquivos e os commits que ainda não estão lá. O que já foi publicado depende do secret scanning do GitHub, que só reconhece padrões de provedor (senha ou segredo genérico passam, com non-provider patterns desligado).
-- No CI o checkout é raso (só o último commit) e não traz o `origin/main`, então lá o gitleaks vê só o commit do push. A garantia sobre os commits anteriores é o pre-push local.
 - Dependência que já está no lockfile não é reavaliada pela idade mínima do pnpm; só o OSV-Scanner a confere.
 - Checklist de segurança na revisão de PR (skill `revisar`).
 - Isolamento entre tenants, LGPD e limites de ação da IA: são decisões de produto.

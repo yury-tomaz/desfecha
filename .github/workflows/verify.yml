@@ -13,6 +13,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # O histórico inteiro traz o origin/main: a mutação mede o que mudou desde o merge-base com ele.
+          fetch-depth: 0
       - uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
       # O token fica só neste passo: o verify.sh instala dependências de terceiros e não deve vê-lo.
       - name: zizmor com as auditorias online
