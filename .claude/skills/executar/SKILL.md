@@ -86,6 +86,8 @@ Todo código é escrito no ciclo abaixo (Extreme Programming), em passos pequeno
 ### 6.1 Vermelho (TDD)
 
 - Cada critério de aceite vira pelo menos um teste. Comece de fora para dentro: primeiro o teste de comportamento, depois testes de unidade se precisar.
+- Onde rodar. Frontend (Vitest, testes em `src/**/*.test.ts`, comandos dentro de `frontend/`): `pnpm exec vitest run <arquivo>` para um teste, `pnpm test` para todos com a cobertura. Backend (JUnit): `./backend/mvnw -f backend/pom.xml test -Dtest=<Classe>` para um teste, `./backend/mvnw -f backend/pom.xml verify` para todos com a cobertura (JaCoCo).
+- A cobertura mínima é de 80% de linhas e de branches no total, e o `scripts/verify.sh` falha abaixo disso. No frontend ela mede só `src/lib/**/*.ts`: a lógica fica em `.ts`, fora dos `.svelte` e de `src/routes/`.
 - Um teste por vez. Rode e veja falhar **pelo motivo certo**: a asserção falha. Erro de compilação ou de configuração não conta.
 - Teste o comportamento pela API pública, não a implementação. Mock só na fronteira externa (APIs de terceiros), nunca do que é nosso.
 - O nome do teste descreve o comportamento.
