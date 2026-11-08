@@ -23,7 +23,7 @@ Todo o código daqui é escrito por agentes. Esta base cobre os riscos que mais 
 
 - Análise estática de segurança do nosso código (SAST, ex.: CodeQL).
 - Imagem Docker: scan, usuário sem root, imagem base fixada por digest.
-- Script Node ou Python rodado pelo agente que abre um arquivo de credencial sozinho: as regras `deny` cobrem as ferramentas do Claude Code e os comandos de arquivo que ele reconhece no Bash (`cat`, `head`, `tail`, `sed`...), não qualquer processo. Fechar isso pede o sandbox do Claude Code (`sandbox.enabled`).
+- Script Node ou Python rodado pelo agente que abre um arquivo de credencial sozinho: as regras `deny` cobrem as ferramentas do Claude Code e os comandos de arquivo que ele reconhece no Bash (`cat`, `head`, `tail`, `sed`...), não qualquer processo. Fechar isso pede o sandbox do Claude Code (`sandbox.enabled`). Desligado por decisão do humano em 2026-11-08, para uma próxima fase: não há dado nem segredo de produto na máquina. As credenciais que existem são a chave SSH e o login do `gh`, com escrita no repositório, e o vetor é código de dependência rodando no `verify.sh`, que o pnpm já restringe (idade mínima, sem script de instalação além do `esbuild`). Reavaliar quando entrar segredo de produto ou deploy.
 - Segredo que já está no `origin/main`: o gitleaks olha os arquivos e os commits que ainda não estão lá. O que já foi publicado depende do secret scanning do GitHub, que só reconhece padrões de provedor (senha ou segredo genérico passam, com non-provider patterns desligado).
 - Dependência que já está no lockfile não é reavaliada pela idade mínima do pnpm; só o OSV-Scanner a confere.
 - Checklist de segurança na revisão de PR (skill `revisar`).

@@ -6,7 +6,7 @@ Este arquivo é um mapa, não um manual. O que dá para descobrir lendo o códig
 
 ## Fase atual
 
-Base do harness. Não proponha tarefas de produto até a base estar pronta: o humano decide quando a fase muda.
+Produto (desde 2026-11-08). A base do harness está pronta, e o trabalho agora são pitches de produto, pela `moldar`. Mudança no harness também anda por pitch, quando um problema se repete. O humano decide quando a fase muda.
 
 ## Onde está cada coisa
 
