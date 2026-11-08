@@ -37,6 +37,7 @@ Todo o código daqui é escrito por agentes. Esta base cobre os riscos que mais 
 | Segredos | gitleaks | `scripts/segredos-check.sh`, `.gitleaks.toml`; casos em `scripts/segredos-check.test.sh` |
 | Bibliotecas | OSV-Scanner | `scripts/dependencias-check.sh`, `osv-scanner.toml`; exceções conferidas por `scripts/dependencias-excecoes-check.sh` |
 | Instalação de pacotes | pnpm | `frontend/pnpm-workspace.yaml` (`minimumReleaseAge`, `trustPolicy`, `blockExoticSubdeps`, `overrides`) |
+| Protótipo sem dependências | `prototipo-check` | `scripts/prototipo-check.sh` (sem `package.json`, sem script nem módulo carregado de URL em `prototipo/`); casos em `scripts/prototipo-check.test.sh`; regras em `prototipo/README.md` |
 | Atualizações | Dependabot | `.github/dependabot.yml` |
 | Workflows | zizmor, actionlint | `scripts/verify.sh` (zizmor offline) e `.github/workflows/verify.yml` (zizmor online, com `GH_TOKEN` só nesse passo) |
 | Agente | Claude Code | `.claude/settings.json` (`permissions.deny`) |
