@@ -7,3 +7,4 @@ trustPolicy: no-downgrade
 blockExoticSubdeps: true
 overrides:
   minimatch: 11.0.4
+  qs: 6.16.2
