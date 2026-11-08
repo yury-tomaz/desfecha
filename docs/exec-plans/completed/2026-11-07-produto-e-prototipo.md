@@ -1,6 +1,6 @@
 # Produto e protótipo: onde as definições moram
 
-Status: em-execucao
+Status: concluido
 
 ## Objetivo
 
@@ -27,15 +27,15 @@ Hoje o produto cabe num arquivo só (`docs/PRODUCT_SENSE.md`) e não existe luga
 
 ## Critérios de aceite
 
-- [ ] `docs/produto/` existe com os temas iniciais (ver Contexto), cada um com as três seções do formato. As 4 perguntas em aberto saíram do `PRODUCT_SENSE.md` e estão nos temas. Comprovado lendo os arquivos.
-- [ ] `docs/PRODUCT_SENSE.md` tem um índice com um link para cada tema. `scripts/verify.sh` falha quando um arquivo de `docs/produto/` não está no índice, quando um link do índice aponta para um arquivo que não existe e quando um tema não tem as três seções. Comprovado criando um tema fora do índice, um link quebrado e um tema sem seção: cada caso falha com mensagem que diz como corrigir, e reverter faz passar.
-- [ ] `prototipo/` tem um `index.html` navegável (pode ser só a página inicial com a lista de telas, vazia) e um documento que explica o propósito, a regra de não ter build nem dependências, e onde ficam marca, fontes e cores (ainda por definir). Comprovado abrindo o `index.html` direto no navegador, sem servidor.
-- [ ] `scripts/verify.sh` falha quando um arquivo do `frontend/` importa algo de `prototipo/`. Comprovado com um import de propósito num `.ts` e num `.svelte`: falha com mensagem que diz como corrigir, e reverter faz passar.
-- [ ] `scripts/verify.sh` falha quando aparece `package.json` ou `<script src="http...">` dentro de `prototipo/`. Comprovado com um caso de cada.
-- [ ] A tabela "Camadas" do `docs/SECURITY.md` tem uma linha para a checagem de que o protótipo não tem dependências, dizendo onde ela está. Comprovado lendo o arquivo.
-- [ ] A skill `refinar` lê o tema relevante de `docs/produto/` e tem uma pergunta a mais no ciclo: se a tarefa toma uma decisão de produto que vale além dela, a decisão é escrita no tema certo, e não só no plano. Comprovado lendo a skill.
-- [ ] O `AGENTS.md` aponta para `docs/produto/` e `prototipo/` em "Onde está cada coisa". Comprovado lendo o arquivo.
-- [ ] `scripts/verify.sh` passa local e no CI. Comprovado com `gh run list` no push do branch da tarefa.
+- [x] `docs/produto/` existe com os temas iniciais (ver Contexto), cada um com as três seções do formato. As 4 perguntas em aberto saíram do `PRODUCT_SENSE.md` e estão nos temas. Comprovado lendo os arquivos.
+- [x] `docs/PRODUCT_SENSE.md` tem um índice com um link para cada tema. `scripts/verify.sh` falha quando um arquivo de `docs/produto/` não está no índice, quando um link do índice aponta para um arquivo que não existe e quando um tema não tem as três seções. Comprovado criando um tema fora do índice, um link quebrado e um tema sem seção: cada caso falha com mensagem que diz como corrigir, e reverter faz passar.
+- [x] `prototipo/` tem um `index.html` navegável (pode ser só a página inicial com a lista de telas, vazia) e um documento que explica o propósito, a regra de não ter build nem dependências, e onde ficam marca, fontes e cores (ainda por definir). Comprovado abrindo o `index.html` direto no navegador, sem servidor.
+- [x] `scripts/verify.sh` falha quando um arquivo do `frontend/` importa algo de `prototipo/`. Comprovado com um import de propósito num `.ts` e num `.svelte`: falha com mensagem que diz como corrigir, e reverter faz passar.
+- [x] `scripts/verify.sh` falha quando aparece `package.json` ou `<script src="http...">` dentro de `prototipo/`. Comprovado com um caso de cada.
+- [x] A tabela "Camadas" do `docs/SECURITY.md` tem uma linha para a checagem de que o protótipo não tem dependências, dizendo onde ela está. Comprovado lendo o arquivo.
+- [x] A skill `refinar` lê o tema relevante de `docs/produto/` e tem uma pergunta a mais no ciclo: se a tarefa toma uma decisão de produto que vale além dela, a decisão é escrita no tema certo, e não só no plano. Comprovado lendo a skill.
+- [x] O `AGENTS.md` aponta para `docs/produto/` e `prototipo/` em "Onde está cada coisa". Comprovado lendo o arquivo.
+- [x] `scripts/verify.sh` passa local e no CI. Comprovado com `gh run list` no push do branch da tarefa.
 
 ## Fora de escopo
 
@@ -65,6 +65,8 @@ Hoje o produto cabe num arquivo só (`docs/PRODUCT_SENSE.md`) e não existe luga
 - 2026-11-08: temas `resolucao`, `integracoes`, `acoes-da-ia` e `lgpd` em `docs/produto/`, com as 4 perguntas movidas. Índice "## Temas" no `PRODUCT_SENSE.md`, com o formato de um tema. `scripts/produto-check.sh` e casos no `verify.sh`.
 - 2026-11-08: `prototipo/` com `index.html`, `estilo.css` e `README.md`. `scripts/prototipo-check.sh` e casos no `verify.sh`; linha em "Camadas" do `docs/SECURITY.md`. O `README.md` disparou a própria checagem (cita `<script src="https://...">`); virou caso de teste e a busca de script remoto ficou só nos arquivos que o navegador carrega.
 - 2026-11-08: skill `refinar` e `AGENTS.md` atualizados. Critérios comprovados no repositório: cada falha provocada (tema fora do índice, link quebrado, tema sem seção, import em `.ts` e em `.svelte`, `package.json`, `<script src="https://...">`) sai com "Como corrigir", e reverter passa. `index.html` aberto por `file://` no Chrome headless, com o CSS aplicado.
+- 2026-11-08: `verify.sh` passou local e no CI (run 42484706712, success).
+- 2026-11-08: concluído.
 
 ## Log de decisões
 
