@@ -1,1 +1,6 @@
 .worktrees/
+
+# Segredos locais, em qualquer pasta. O modelo versionado fica em .env.example.
+.env
+.env.*
+!.env.example
