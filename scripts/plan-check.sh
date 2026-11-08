@@ -119,6 +119,12 @@ confere_pitch() {
   echo "ok: $dir"
 }
 
+if [ $# -eq 0 ]; then
+  for p in "$(dirname "$0")/../docs/pitches"/*/; do
+    [ -d "$p" ] && set -- "$@" "$p"
+  done
+fi
+
 rc=0
 for p in "$@"; do
   confere_pitch "$p" || rc=1

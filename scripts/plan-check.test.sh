@@ -237,6 +237,30 @@ base
 rm -f "$pitch/pitch.md"
 confere 1 "pasta sem pitch.md falha"
 
+repo=$(mktemp -d)
+trap 'rm -rf "$raiz" "$repo"' EXIT
+mkdir -p "$repo/scripts" "$repo/docs/pitches"
+cp "$checagem" "$repo/scripts/plan-check.sh"
+todos() {
+  local esperado=$1 caso=$2 rc=0
+  "$repo/scripts/plan-check.sh" >/dev/null 2>&1 || rc=$?
+  if [ "$rc" -ne "$esperado" ]; then
+    echo "plan-check: esperava rc=$esperado e saiu rc=$rc no caso: $caso"
+    falhas=$((falhas + 1))
+  fi
+}
+
+todos 0 "sem argumento e sem pitches passa"
+
+base
+cp -R "$pitch" "$repo/docs/pitches/"
+todos 0 "sem argumento, com um pitch válido em docs/pitches, passa"
+
+base
+remove_secao "$pitch/pitch.md" "No-gos"
+cp -R "$pitch" "$repo/docs/pitches/2026-01-02-outro"
+todos 1 "sem argumento, com um pitch inválido em docs/pitches, falha"
+
 if [ "$falhas" -gt 0 ]; then
   echo "$falhas caso(s) de plan-check falharam. Corrija scripts/plan-check.sh, não os casos."
   exit 1
