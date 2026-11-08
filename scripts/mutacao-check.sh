@@ -21,7 +21,7 @@ if [ -z "$alterados" ]; then
 fi
 
 if [ -n "$backend" ]; then
-  # backend/src/main/java/com/x/A.java vira com.x.A e com.x.A$*, para pegar as classes internas.
+  # O PIT trata cada classe interna como classe à parte: com.x.A sozinho deixaria A$B sem mutação.
   classes=$(sed -E 's|^backend/src/main/java/||; s|\.java$||; s|/|.|g; s|.*|&,&$*|' <<<"$backend" | paste -sd, -)
   echo "backend: PIT em $(tr '\n' ' ' <<<"$backend")"
   relatorio=backend/target/pit-reports/mutations.csv
