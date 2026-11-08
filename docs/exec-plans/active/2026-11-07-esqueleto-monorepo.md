@@ -1,6 +1,6 @@
 # Esqueleto do monorepo com verificação automática
 
-Status: refinado
+Status: em-execucao
 
 ## Objetivo
 
@@ -53,6 +53,7 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 
 - 2026-11-07: exec-plan criado.
 - 2026-11-07: refinado e aprovado.
+- 2026-11-07: execução iniciada.
 
 ## Log de decisões
 
