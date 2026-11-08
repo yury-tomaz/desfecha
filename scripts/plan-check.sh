@@ -5,10 +5,28 @@
 set -euo pipefail
 
 secoes_do_pitch=("Problema" "Solução" "Protótipo" "Rabbit holes" "No-gos" "Revisão do protótipo" "Log de decisões" "Perguntas em aberto")
+secoes_preenchidas_apos_shaping=("Problema" "Solução" "Protótipo" "Rabbit holes" "No-gos" "Revisão do protótipo")
 
 has_section() { grep -qxF "## $2" "$1"; }
 
 linha() { grep -m1 -E "^$2: " "$1" | sed "s/^$2: //" || true; }
+
+section_lines() {
+  awk -v h="## $2" '
+    $0 == h { inside = 1; next }
+    /^## / { inside = 0 }
+    inside && $0 !~ /^[[:space:]]*$/ { n++ }
+    END { print n + 0 }
+  ' "$1"
+}
+
+perguntas_em_aberto() {
+  local total=0 f
+  for f in "$1/pitch.md" "$1"/escopos/*.md; do
+    [ -f "$f" ] && total=$((total + $(section_lines "$f" "Perguntas em aberto")))
+  done
+  echo "$total"
+}
 
 confere_pitch() {
   local dir=${1%/} md=${1%/}/pitch.md
@@ -32,8 +50,21 @@ confere_pitch() {
       *) errors+=("pitch.md: apetite inválido '$apetite'. Valores: pequeno, grande, a definir.") ;;
     esac
     for s in "${secoes_do_pitch[@]}"; do
-      has_section "$md" "$s" || errors+=("pitch.md: falta a seção '## $s'. Acrescente o título, mesmo que vazia no shaping.")
+      if ! has_section "$md" "$s"; then
+        errors+=("pitch.md: falta a seção '## $s'. Acrescente o título, mesmo que vazia no shaping.")
+      elif [ "$estado" != shaping ] && [[ " ${secoes_preenchidas_apos_shaping[*]} " == *" $s "* ]] && [ "$(section_lines "$md" "$s")" -eq 0 ]; then
+        errors+=("pitch.md: a seção '## $s' está vazia fora do shaping. Preencha (sem interface: 'Sem interface.' ou 'Sem protótipo.') ou volte o pitch para shaping.")
+      fi
     done
+
+    local perguntas
+    perguntas=$(perguntas_em_aberto "$dir")
+    if [ "$estado" = apostado ] && [ "$perguntas" -gt 0 ]; then
+      errors+=("Pitch apostado com perguntas em aberto. Responda com o humano e tire da seção, ou volte o pitch para shaping.")
+    fi
+    if [ "$estado" = bloqueado ] && [ "$perguntas" -eq 0 ]; then
+      errors+=("Pitch bloqueado sem pergunta em aberto. Escreva em '## Perguntas em aberto' (do pitch ou do escopo) o que o humano precisa decidir, com a sua recomendação.")
+    fi
   fi
 
   if [ ${#errors[@]} -gt 0 ]; then

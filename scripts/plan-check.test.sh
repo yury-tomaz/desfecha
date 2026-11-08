@@ -143,6 +143,34 @@ rm -rf "$pitch/escopos"
 troca "$pitch/pitch.md" "Apetite: grande" "Apetite: a definir"
 confere 1 "apetite a definir fora do shaping falha"
 
+for s in "Problema" "Solução" "Protótipo" "Rabbit holes" "No-gos" "Revisão do protótipo"; do
+  base
+  esvazia_secao "$pitch/pitch.md" "$s"
+  confere 1 "pitch apostado com a seção $s vazia falha"
+done
+
+base
+rm -rf "$pitch/escopos"
+troca "$pitch/pitch.md" "Estado: apostado" "Estado: shaping"
+for s in "Problema" "Solução" "Protótipo" "Rabbit holes" "No-gos" "Revisão do protótipo"; do
+  esvazia_secao "$pitch/pitch.md" "$s"
+done
+pergunta "$pitch/pitch.md"
+confere 0 "pitch em shaping com seções vazias e perguntas em aberto passa"
+
+base
+pergunta "$pitch/pitch.md"
+confere 1 "pitch apostado com pergunta em aberto falha"
+
+base
+troca "$pitch/pitch.md" "Estado: apostado" "Estado: bloqueado"
+confere 1 "pitch bloqueado sem pergunta em aberto falha"
+
+base
+troca "$pitch/pitch.md" "Estado: apostado" "Estado: bloqueado"
+pergunta "$pitch/escopos/linha-do-tempo.md"
+confere 0 "pitch bloqueado com a pergunta no escopo passa"
+
 if [ "$falhas" -gt 0 ]; then
   echo "$falhas caso(s) de plan-check falharam. Corrija scripts/plan-check.sh, não os casos."
   exit 1
