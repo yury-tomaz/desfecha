@@ -44,9 +44,9 @@ Hoje só existe `scripts/verify.sh`. As regras da skill `executar` (não pular a
 
 - [x] Hook de pre-push versionado e ativação de `core.hooksPath`
 - [x] Bloqueio de `git push --no-verify` em `.claude/settings.json`
-- [ ] ESLint no frontend com os conjuntos recomendados e as regras de código comentado e de TODO
-- [ ] Checagem de código comentado e Checkstyle de TODO no backend
-- [ ] Ligar os lints em `scripts/verify.sh`
+- [x] ESLint no frontend com os conjuntos recomendados e as regras de código comentado e de TODO
+- [x] Checagem de código comentado e Checkstyle de TODO no backend
+- [x] Ligar os lints em `scripts/verify.sh`
 - [ ] `scripts/refactor-check.sh`
 - [ ] Atualizar `AGENTS.md` e a skill `executar`
 
@@ -58,11 +58,17 @@ Hoje só existe `scripts/verify.sh`. As regras da skill `executar` (não pular a
 - 2026-11-07: execução iniciada.
 - 2026-11-07: hook de pre-push testado num clone limpo (do branch da tarefa, com `git config core.hooksPath .githooks`) empurrando para um remote bare local: commit com `frontend/src/lib/feio.ts` desformatado → push recusado (rc=1, mensagem do hook); numa worktree criada com `git worktree add` a partir do clone → recusado igual (rc=1); sem o arquivo, push passa no clone e na worktree (rc=0).
 - 2026-11-07: bloqueio de `--no-verify` testado passando o JSON de chamada da ferramenta Bash para `.claude/hooks/bloqueia-push-no-verify.sh`. Bloqueadas (rc=2, com mensagem): `git push --no-verify`; `git push origin x --no-verify`; `git push --no-verify origin x`; `git push -u origin plano/x --no-veri`; `git -C /a/b push --no-verif`; `cd x && git push origin main --no-verify`. Liberadas (rc=0): `git push origin x`; `git push --verify`; `git commit --no-verify -m a`; `git commit --no-verify -m a && git push`; `git status; echo --no-verify`. O hook só passa a valer nas sessões abertas no `main` depois do merge, porque o Claude Code lê `.claude/settings.json` da pasta onde a sessão começou.
+- 2026-11-07: ESLint no frontend (flat config, `eslint.config.js`) com `@eslint/js`, `typescript-eslint`, `eslint-plugin-svelte` e `eslint-config-prettier` recomendados, mais as regras locais de `eslint-sensores.js`. O `src/app.d.ts` do template tinha interfaces comentadas e foi limpo. `pnpm lint` entra em `scripts/verify.sh` antes da checagem de tipos.
+- 2026-11-07: backend com o teste estrutural `NoCommentedCodeTest` (detector `CommentedCodeDetector`, com testes de unidade) e o Checkstyle `TodoComment` na fase `verify`.
 
 ## Log de decisões
 
 - **D1. Ativação do hook pelo setup do `AGENTS.md` (`git config core.hooksPath .githooks`), não automática**: as formas automáticas (script `prepare` do pnpm, hook do mise) escondem um efeito colateral no `.git/config` dentro de outro comando e dependem de quem roda qual ferramenta primeiro. Um comando explícito no setup é visível e vale para todas as worktrees.
 - **D2. O hook roda `scripts/verify.sh` na árvore de trabalho, não no commit empurrado**: é o mesmo comando do CI e o agente empurra com a árvore limpa; reproduzir o commit numa árvore temporária custaria um build completo a mais por push.
 - **D3. Bloqueio por hook `PreToolUse`, não por regra `deny`**: o git aceita abreviação de opção longa (`--no-veri` já vale como `--no-verify`, testado), e a opção pode vir em qualquer posição. Uma regra `deny` por prefixo não cobre isso; uma expressão regular num hook cobre. O hook não depende de `jq`.
+- **D4. As regras de código comentado e de TODO do frontend são `sonarjs/no-commented-code` e `no-warning-comments` envolvidas num plugin local (`frontend/eslint-sensores.js`)**: as duas regras têm mensagem fixa em inglês, e `no-warning-comments` não aceita exceção, então barraria também o formato `TODO(<slug>): `. O envoltório troca a mensagem pela que diz como corrigir e filtra o formato aceito. A detecção continua sendo a das regras originais.
+- **D5. TODO e FIXME só contam em maiúsculas, nos dois lados**: `no-warning-comments` compara sem caixa, e "todo" é palavra comum em português ("o todo do pedido"). O Checkstyle já compara com caixa.
+- **D6. Limites conhecidos do `sonarjs/no-commented-code`**: ele junta comentários de linha vizinhos e analisa o grupo inteiro, então uma linha de código logo abaixo de uma linha de prosa, sem linha em branco, passa. Comentário HTML (`<!-- -->`) no markup do `.svelte` também não é analisado; o `<script>` é. Aceito: é a regra pedida no plano, e corrigir isso seria escrever outro detector.
+- **D7. Backend: código comentado detectado por teste estrutural JUnit com heurística (`CommentedCodeDetector`)**: o Checkstyle e o PMD não têm regra para isso. O detector lê o fonte ignorando strings, text blocks e chars, e marca a linha de comentário que termina em `;`, `{` ou `}`, ou que é só uma anotação. Javadoc fica de fora, porque exemplo de uso em `{@code}` é legítimo. Fica em `src/test`, porque é sensor, não produto.
 
 ## Perguntas em aberto
