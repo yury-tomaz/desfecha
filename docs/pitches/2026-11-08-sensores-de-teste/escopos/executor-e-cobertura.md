@@ -1,6 +1,6 @@
 # Executor e cobertura
 
-Colina: subindo
+Colina: descendo
 
 ## Objetivo
 
@@ -8,11 +8,11 @@ O frontend ganha executor de testes (Vitest, `pnpm test`), e os dois lados ganha
 
 ## Critérios de aceite
 
-- [ ] `pnpm test` roda os testes do frontend e o `verify.sh` chama esse comando. Comprovado com um teste de exemplo que falha de propósito: o `verify.sh` falha, e reverter faz passar (registro no log de progresso).
-- [ ] A cobertura do frontend mede só `src/lib/**/*.ts` e falha abaixo de 80% de linhas ou de branches, com mensagem que diz como corrigir. Comprovado com código de exemplo sem teste: o `verify.sh` falha; com teste, passa (registro no log de progresso).
-- [ ] A cobertura do backend mede o código de produção menos `BackendApplication` e falha abaixo de 80% de linhas ou de branches, com mensagem que diz como corrigir. Comprovado com código de exemplo sem teste: o `verify.sh` falha; com teste, passa (registro no log de progresso).
-- [ ] Com o código atual (zero arquivo medido nos dois lados), o `verify.sh` passa. Comprovado por `scripts/verify.sh`.
-- [ ] A skill `executar` cita os comandos de teste e de cobertura dos dois lados. Comprovado por `grep -n "pnpm test\|mvnw" .claude/skills/executar/SKILL.md`.
+- [x] `pnpm test` roda os testes do frontend e o `verify.sh` chama esse comando. Comprovado com um teste de exemplo que falha de propósito: o `verify.sh` falha, e reverter faz passar (registro no log de progresso).
+- [x] A cobertura do frontend mede só `src/lib/**/*.ts` e falha abaixo de 80% de linhas ou de branches, com mensagem que diz como corrigir. Comprovado com código de exemplo sem teste: o `verify.sh` falha; com teste, passa (registro no log de progresso).
+- [x] A cobertura do backend mede o código de produção menos `BackendApplication` e falha abaixo de 80% de linhas ou de branches, com mensagem que diz como corrigir. Comprovado com código de exemplo sem teste: o `verify.sh` falha; com teste, passa (registro no log de progresso).
+- [x] Com o código atual (zero arquivo medido nos dois lados), o `verify.sh` passa. Comprovado por `scripts/verify.sh`.
+- [x] A skill `executar` cita os comandos de teste e de cobertura dos dois lados. Comprovado por `grep -n "pnpm test\|mvnw" .claude/skills/executar/SKILL.md`.
 
 ## Log de progresso
 
@@ -20,6 +20,9 @@ O frontend ganha executor de testes (Vitest, `pnpm test`), e os dois lados ganha
 - 2026-11-08: Vitest no frontend, `pnpm test` (`vitest run`) e o passo "frontend: testes (Vitest)" no `verify.sh`. Comprovado com `src/lib/exemplo.test.ts` esperando `1 + 1` igual a 3: `pnpm test` falhou na asserção e o `verify.sh` saiu com 1 nesse passo; trocado para 2, passou; o exemplo saiu do código.
 - 2026-11-08: cobertura do frontend (`@vitest/coverage-v8`) dentro do `pnpm test`, com mínimo de 80% de linhas e de branches em `src/lib/**/*.ts`, e mensagem de como corrigir no `verify.sh`. Comprovado com `src/lib/exemplo.ts` (função com um `if`): sem teste, 0% e o `verify.sh` saiu com 1 com a mensagem; com teste só do branch negativo, 50% de linhas e de branches e `pnpm test` falhou; com os dois branches, 100% e passou. Sem o exemplo (zero arquivo medido), `pnpm test` passa com `0/0`.
 - 2026-11-08: cobertura do backend (JaCoCo) no `mvnw verify`, com mínimo de 80% de linhas e de branches no total, sem `BackendApplication`, e mensagem de como corrigir no `verify.sh`. Comprovado com `com.desfecha.Exemplo` (método com um `if`): sem teste, o `verify.sh` saiu com 1 com a mensagem; com teste só do branch negativo, `lines covered ratio is 0.66` e `branches covered ratio is 0.50`, falhou; com os dois, `All coverage checks have been met`. Sem o exemplo, `Analyzed bundle 'backend' with 0 classes` e passa.
+- 2026-11-08: colina descendo. As duas coberturas funcionam com e sem arquivo medido; resta documentar os comandos na `executar`.
+- 2026-11-08: `executar` (seção 6.1) cita os comandos de teste e de cobertura dos dois lados; `AGENTS.md` e o cabeçalho do `verify.sh` citam a cobertura. `scripts/refactor-check.sh` sem achado novo (o `src/lib/index.ts` sem uso no knip já existia). `scripts/verify.sh` ok.
+- 2026-11-08: escopo concluído.
 
 ## Log de decisões
 
