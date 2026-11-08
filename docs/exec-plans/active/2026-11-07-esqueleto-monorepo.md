@@ -42,9 +42,9 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 
 - [x] `mise.toml` com Java 21 e Node 22
 - [x] Backend Spring Boot mínimo com teste do endpoint de saúde
-- [ ] Frontend SvelteKit mínimo
-- [ ] Formatação automática nos dois
-- [ ] Comando único de verificação na raiz
+- [x] Frontend SvelteKit mínimo
+- [x] Formatação automática nos dois
+- [x] Comando único de verificação na raiz
 - [ ] Dockerfiles e `docker-compose.yml`
 - [ ] CI no GitHub Actions
 - [ ] Atualizar `AGENTS.md`
@@ -56,6 +56,8 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 - 2026-11-07: execução iniciada.
 - 2026-11-07: `mise.toml` criado; `mise install` instalou Java Temurin 21.0.13, Node 22.21.1 e pnpm 10.34.9.
 - 2026-11-07: backend gerado pelo start.spring.io (Spring Boot 4.1.2, web + actuator). `HealthTest` passa com `mvnw verify`.
+- 2026-11-07: frontend gerado com `sv create` 1.3.0 (SvelteKit 3, Svelte 5, Vite 8, TypeScript 6, Prettier). `build`, `check` e `format:check` passam.
+- 2026-11-07: `scripts/verify.sh` e `scripts/format.sh` criados. Provas: Java desformatado → verify sai 1 (Spotless); `+page.svelte` desformatado → sai 1 (Prettier); `HealthTest` quebrado → sai 1 (1 falha); tudo revertido → sai 0. `format.sh` desfaz a desformatação dos dois lados (diff vazio).
 
 ## Log de decisões
 
@@ -65,6 +67,9 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 - **D4. Pacote `com.desfecha`**: segue o nome do repositório no GitHub (`desfecha`). Trocar depois é um rename simples.
 - **D5. Teste de saúde com servidor real (`RANDOM_PORT`) e `java.net.http.HttpClient`**: comprova que a aplicação sobe e responde HTTP de verdade, sem depender de cliente de teste que mudou de módulo no Spring Boot 4.
 - **D6. Spotless com google-java-format 2.0.0 e sortPom**: padrão amplamente usado; a checagem roda na fase `verify` do Maven, então `mvnw verify` já falha com código fora do padrão.
+- **D7. Frontend com `adapter-node` em vez de `adapter-auto`**: gera um servidor Node que roda no container Docker.
+- **D8. Script `lint` do template renomeado para `format:check`**: ele só roda Prettier, e lint de verdade é outra tarefa. O nome não engana.
+- **D9. Comandos em `scripts/verify.sh` e `scripts/format.sh`, sempre via `mise exec`**: ficam ao lado de `plan-check.sh`, e usam as versões do `mise.toml` mesmo se o shell não tiver o mise ativado.
 
 ## Perguntas em aberto
 
