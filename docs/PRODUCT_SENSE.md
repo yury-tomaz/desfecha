@@ -48,9 +48,18 @@ cliente escreve → vira ticket → agente IA entende e age
 - **Dados pessoais (LGPD).** As conversas têm CPF, endereço e dados de pedido.
 - **O handoff para humano faz parte do produto,** não é uma falha. O humano precisa receber o contexto completo.
 
-## Perguntas em aberto
+## Temas
 
-- O que conta como "resolvido"? Cliente confirmou? Não houve reabertura em X dias? Chamado passado para humano conta?
-- Quais plataformas de e-commerce e meios de pagamento entram primeiro?
-- Quais ações a IA pode executar sozinha, e com quais limites padrão?
-- Quais as regras de retenção e mascaramento de dados pessoais (LGPD), e o que pode ser enviado ao modelo de IA?
+Cada tema de produto tem um arquivo em `docs/produto/`, com o estado atual e as decisões. As perguntas em aberto ficam no tema a que pertencem.
+
+- [Resolução](produto/resolucao.md): o que conta como chamado resolvido.
+- [Integrações](produto/integracoes.md): plataformas de e-commerce e meios de pagamento.
+- [Ações da IA](produto/acoes-da-ia.md): o que a IA executa sozinha e com quais limites.
+- [LGPD](produto/lgpd.md): retenção, mascaramento e o que vai para o modelo.
+
+### Como um tema é escrito
+
+- Um arquivo por tema, não por decisão: quem lê encontra o estado atual sem precisar descobrir qual decisão substituiu qual. O histórico fica no git.
+- Três seções, nesta ordem: `## Estado atual`, `## Decisões` (cada item com data e motivo) e `## Perguntas em aberto`.
+- Entra o resultado de uma discussão e o porquê dele, nunca a transcrição.
+- Tema novo entra nesta lista. `scripts/verify.sh` falha se um arquivo de `docs/produto/` não estiver aqui, se um link daqui não existir ou se um tema não tiver as três seções.
