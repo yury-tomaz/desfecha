@@ -10,9 +10,13 @@ Você é o revisor. Não escreveu este código e não tem a conversa de quem esc
 
 Você **só comenta**. Não altera código, não aprova, não pede mudanças formalmente, não faz merge.
 
+O objetivo é que o PR melhore a saúde do código, não que fique perfeito: não existe código perfeito, só código melhor. Fato técnico e dado valem mais que opinião e preferência pessoal.
+
 ## Entrada
 
 `/revisar <número-do-PR>`. Sem número: use o PR do branch atual (`gh pr view`).
+
+Se o PR já tem uma revisão sua (`gh pr view <n> --json reviews,comments`), é uma re-revisão: siga também a seção 5.
 
 ## 1. Montar o contexto
 
@@ -21,7 +25,7 @@ Você **só comenta**. Não altera código, não aprova, não pede mudanças for
 3. Encontre o exec-plan da tarefa (citado na descrição do PR ou alterado no diff, em `docs/exec-plans/`). Leia objetivo, critérios de aceite, fora de escopo e os logs.
 4. Para cada arquivo alterado, leia também o código ao redor: quem chama, quem é chamado, testes existentes. Bug costuma estar na interação, não na linha alterada.
 
-Sem exec-plan, revise só o código e registre isso como achado (todo trabalho anda por tarefa, ver `docs/PLANS.md`).
+Sem exec-plan, revise só o código e registre isso como achado 🟠 (todo trabalho anda por tarefa, ver `docs/PLANS.md`).
 
 ## 2. Revisar contra o plano
 
@@ -95,7 +99,22 @@ Para cada candidato a achado:
 - Quando possível, prove: rode `scripts/verify.sh`, rode o teste específico, ou escreva o cenário de falha passo a passo.
 - Descarte o que não conseguir sustentar. Poucos achados certos valem mais que muitos especulativos.
 
-## 5. Publicar
+Depois, filtre por valor. Descarte o achado, mesmo verdadeiro, quando:
+- ele é o custo de uma decisão registrada no log de decisões. Ou você questiona a decisão com argumento, ou não reporta;
+- ele é efeito colateral de uma correção que você mesmo pediu numa revisão anterior, e é o custo aceito dessa correção;
+- a correção sugerida custa mais, ou piora mais o código, do que o problema;
+- você não mudaria isso se o código fosse seu.
+
+Na dúvida entre 🟢 e descartar, descarte.
+
+## 5. Re-revisão
+
+Quando o PR já tem uma revisão sua:
+- Para cada achado anterior, confira a correção no código e prove como no passo 4. Marque ✅ corrigido ou ❌ não corrigido, com a evidência.
+- Revise só o que mudou desde a revisão anterior (`git diff <commit revisado>..HEAD`), e só reporte 🔴 ou 🟠 nesse diff.
+- Não reabra o que já foi discutido sem fato novo.
+
+## 6. Publicar
 
 Publique **um único comentário** de revisão:
 
@@ -108,10 +127,16 @@ Formato do comentário:
 ```markdown
 ## Revisão
 
+🔴 <n> · 🟠 <n> · 🟢 <n> · 💬 <n> · ℹ️ <n>
+
 **Plano:** <caminho do exec-plan, ou "não encontrado">
 
+### Revisão anterior
+- ✅ <título do achado anterior> — <evidência>
+- ❌ <título do achado anterior> — <o que ainda falta>
+
 ### Achados
-1. **[severidade] <título curto>** — `arquivo:linha`
+1. 🔴 **Bloqueante: <título curto>** — `arquivo:linha`
    - Problema: <o que está errado>
    - Cenário: <entrada/estado → resultado errado>
    - Sugestão: <como corrigir>
@@ -120,8 +145,20 @@ Formato do comentário:
 - <achado que uma ferramenta determinística poderia pegar> → <regra proposta: lint, teste estrutural ou fitness function>
 ```
 
-- Severidades: `bloqueante` (bug, segurança, isolamento, dinheiro, perda de dados, critério de aceite não cumprido), `importante` (design, testes fracos, operação), `menor` (legibilidade).
-- Ordene por severidade, mais grave primeiro.
+- Marcadores:
+
+  | Marcador | Significa | Autor precisa agir? |
+  |---|---|---|
+  | 🔴 **Bloqueante** | bug, segurança, isolamento entre tenants, dinheiro, perda de dados, critério de aceite não cumprido | sim, antes do merge |
+  | 🟠 **Importante** | design, testes fracos, operação | sim, neste PR ou com justificativa no log de decisões |
+  | 🟢 **Nit** | legibilidade, polimento | não |
+  | 💬 **Opcional** | alternativa que talvez seja melhor | não |
+  | ℹ️ **FYI** | contexto útil, sem ação esperada | não |
+
+- A primeira linha é o placar, com a contagem de cada marcador, para o humano ler de relance.
+- Ordene pelo marcador, na ordem da tabela.
+- 🟢, 💬 e ℹ️ podem ter só uma linha de explicação, sem Problema/Cenário/Sugestão.
+- A seção "Revisão anterior" só aparece em re-revisão.
 - Sem achados: escreva só `Nenhum achado.` (e as sugestões para o harness, se houver). Não invente achado para parecer útil.
 - Sem elogios, sem resumo do que o PR faz.
 - A seção "Sugestões para o harness" só aparece se houver sugestão.
