@@ -8,9 +8,8 @@ function comMensagem(regra, mensagem, filtro = () => true) {
 		meta: { ...regra.meta, messages: { sensor: mensagem } },
 		create(context) {
 			const reportados = new Set();
-			const report = (descritor) => {
-				const { node, loc } = descritor;
-				if (!filtro(descritor) || reportados.has(node)) return;
+			const report = ({ node, loc }) => {
+				if (!filtro(node) || reportados.has(node)) return;
 				reportados.add(node);
 				context.report({ node, loc, messageId: 'sensor' });
 			};
@@ -29,7 +28,7 @@ export default {
 		'todo-sem-plano': comMensagem(
 			builtinRules.get('no-warning-comments'),
 			'TODO ou FIXME sem exec-plan. Escreva no formato TODO(<slug-do-plano>): texto, com o nome do arquivo do plano sem .md (ex.: TODO(2026-11-07-sensores-computacionais): ...), ou apague o comentário.',
-			({ node }) => TODO_SEM_PLANO.test(node.value)
+			(comentario) => TODO_SEM_PLANO.test(comentario.value)
 		)
 	}
 };
