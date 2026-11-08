@@ -23,6 +23,7 @@ O frontend ganha executor de testes (Vitest, `pnpm test`), e os dois lados ganha
 - 2026-11-08: colina descendo. As duas coberturas funcionam com e sem arquivo medido; resta documentar os comandos na `executar`.
 - 2026-11-08: `executar` (seção 6.1) cita os comandos de teste e de cobertura dos dois lados; `AGENTS.md` e o cabeçalho do `verify.sh` citam a cobertura. `scripts/refactor-check.sh` sem achado novo (o `src/lib/index.ts` sem uso no knip já existia). `scripts/verify.sh` ok.
 - 2026-11-08: escopo concluído.
+- 2026-11-08: sugestão de próximo pitch, da revisão do PR #8 (sem achados): casos automáticos para os sensores de cobertura. Hoje a prova está só neste log e nenhum arquivo é medido, então uma configuração quebrada depois (glob do `coverage.include`, `excludes` do JaCoCo) passaria calada até o primeiro código de produto. Um `scripts/cobertura-check.test.sh` rodaria os dois lados contra um exemplo temporário sem teste e com teste completo, e conferiria o código de saída.
 
 ## Log de decisões
 
