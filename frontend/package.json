@@ -28,6 +28,8 @@
 		"eslint-plugin-sonarjs": "^4.2.2",
 		"eslint-plugin-svelte": "^3.24.1",
 		"globals": "^17.14.0",
+		"jscpd": "^5.4.2",
+		"knip": "^6.44.2",
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^4.1.0",
 		"svelte": "^5.57.2",
