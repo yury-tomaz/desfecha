@@ -27,7 +27,7 @@ Base do harness. Não proponha tarefas de produto até a base estar pronta: o hu
 
 - `mise install`: instala as versões de ferramenta fixadas em `mise.toml`.
 - `git config core.hooksPath .githooks`: setup, uma vez por clone (vale para todas as worktrees). Liga o hook de pre-push, que roda `scripts/verify.sh`.
-- `scripts/verify.sh`: build, testes, cobertura, tipos, lint e formatação dos dois lados. Tem que passar antes de todo push: o hook de pre-push roda, e o CI roda o mesmo comando a cada push. O commit é livre. `git push --no-verify` é bloqueado por `.claude/settings.json`.
+- `scripts/verify.sh`: build, testes, cobertura, mutação, tipos, lint e formatação dos dois lados. Tem que passar antes de todo push: o hook de pre-push roda, e o CI roda o mesmo comando a cada push. O commit é livre. `git push --no-verify` é bloqueado por `.claude/settings.json`.
 - `scripts/refactor-check.sh`: relatório de duplicação, código morto e complexidade cognitiva para o passo de refactoring. Não bloqueia nada.
 - `scripts/format.sh`: formata os dois lados no padrão que a verificação confere.
 - `docker-compose up --build`: sobe backend (`:8080`) e frontend (`:3000`). Use `docker-compose`, não `docker compose`.
