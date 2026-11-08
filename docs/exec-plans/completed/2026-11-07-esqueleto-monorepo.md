@@ -1,6 +1,6 @@
 # Esqueleto do monorepo com verificação automática
 
-Status: em-execucao
+Status: concluido
 
 ## Objetivo
 
@@ -19,14 +19,14 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 
 ## Critérios de aceite
 
-- [ ] `mise install` na raiz deixa as versões fixadas disponíveis, e `mise exec -- node -v` mostra a versão 22. Comprovado rodando os dois comandos.
-- [ ] O backend tem um teste que sobe a aplicação Spring e confirma que o endpoint de saúde responde `UP`. Comprovado pelo comando de verificação.
-- [ ] O frontend compila (`build`) e passa na checagem de tipos (`svelte-check`). Comprovado pelo comando de verificação.
-- [ ] Backend e frontend têm formatação automática (um comando que formata) e checagem de formatação no comando de verificação. Comprovado assim: desformatar de propósito um arquivo Java e um arquivo do frontend faz a verificação falhar; reverter faz passar. Registrar o resultado no log de progresso.
-- [ ] Um único comando na raiz roda build, testes, checagem de tipos e checagem de formatação dos dois lados, e sai com código diferente de zero se qualquer parte falhar. Comprovado quebrando um teste de propósito (falha) e revertendo (passa).
-- [ ] `docker-compose up --build` na raiz sobe backend e frontend. Comprovado com `curl` no endpoint de saúde do backend (responde `UP`) e na página inicial do frontend (responde 200).
-- [ ] O CI do GitHub Actions roda, a cada push, o mesmo comando de verificação da raiz. Comprovado com `gh run list` mostrando a execução do push do branch da tarefa concluída com sucesso.
-- [ ] `AGENTS.md` aponta para o comando de verificação e para o comando que sobe tudo com Docker.
+- [x] `mise install` na raiz deixa as versões fixadas disponíveis, e `mise exec -- node -v` mostra a versão 22. Comprovado rodando os dois comandos.
+- [x] O backend tem um teste que sobe a aplicação Spring e confirma que o endpoint de saúde responde `UP`. Comprovado pelo comando de verificação.
+- [x] O frontend compila (`build`) e passa na checagem de tipos (`svelte-check`). Comprovado pelo comando de verificação.
+- [x] Backend e frontend têm formatação automática (um comando que formata) e checagem de formatação no comando de verificação. Comprovado assim: desformatar de propósito um arquivo Java e um arquivo do frontend faz a verificação falhar; reverter faz passar. Registrar o resultado no log de progresso.
+- [x] Um único comando na raiz roda build, testes, checagem de tipos e checagem de formatação dos dois lados, e sai com código diferente de zero se qualquer parte falhar. Comprovado quebrando um teste de propósito (falha) e revertendo (passa).
+- [x] `docker-compose up --build` na raiz sobe backend e frontend. Comprovado com `curl` no endpoint de saúde do backend (responde `UP`) e na página inicial do frontend (responde 200).
+- [x] O CI do GitHub Actions roda, a cada push, o mesmo comando de verificação da raiz. Comprovado com `gh run list` mostrando a execução do push do branch da tarefa concluída com sucesso.
+- [x] `AGENTS.md` aponta para o comando de verificação e para o comando que sobe tudo com Docker.
 
 ## Fora de escopo
 
@@ -59,6 +59,10 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 - 2026-11-07: frontend gerado com `sv create` 1.3.0 (SvelteKit 3, Svelte 5, Vite 8, TypeScript 6, Prettier). `build`, `check` e `format:check` passam.
 - 2026-11-07: `scripts/verify.sh` e `scripts/format.sh` criados. Provas: Java desformatado → verify sai 1 (Spotless); `+page.svelte` desformatado → sai 1 (Prettier); `HealthTest` quebrado → sai 1 (1 falha); tudo revertido → sai 0. `format.sh` desfaz a desformatação dos dois lados (diff vazio).
 - 2026-11-07: `docker-compose up --build -d` sobe os dois serviços. `curl localhost:8080/actuator/health` → `{"status":"UP",...}` HTTP 200; `curl localhost:3000/` → HTTP 200 com `<h1>SuporteDesk</h1>`.
+- 2026-11-07: CI criado. `gh run list` mostra o run 42432177883 (push do branch `plano/esqueleto-monorepo`) concluído com `success`.
+- 2026-11-07: critérios verificados; `mise install` ok e `mise exec -- node -v` → v22.21.1.
+- 2026-11-07: sugestão de próxima tarefa: CI testar também o build das imagens Docker (ficou fora de escopo).
+- 2026-11-07: concluído.
 
 ## Log de decisões
 
