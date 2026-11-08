@@ -1,6 +1,6 @@
 # Lacunas do fluxo
 
-Estado: shaping
+Estado: apostado
 Apetite: pequeno
 
 ## Problema
@@ -63,5 +63,6 @@ Sem protótipo.
 
 - **D3. Saída do `bloqueado` dividida entre `executar` e `moldar`, sem skill nova (2026-11-08):** escolha do humano. Responder ou cortar escopo continua o build, que é da `executar`; voltar ao shaping ou descartar é desenho de pitch, que é da `moldar`. Uma skill nova só encaminharia.
 - **D4. Descartar com escopo mergeado vira `entregue` com o que foi mergeado (2026-11-08):** o código mergeado já está no `main` e precisa do pitch como contexto. Os escopos não mergeados saem da pasta, o resto vai para "No-gos" com o motivo do humano, e o `plan-check.sh` já aceita `entregue` com todos os critérios dos escopos restantes marcados. Reverter código mergeado é decisão do humano num pitch próprio, não do descarte.
+- 2026-11-08: apostado pelo humano.
 
 ## Perguntas em aberto
