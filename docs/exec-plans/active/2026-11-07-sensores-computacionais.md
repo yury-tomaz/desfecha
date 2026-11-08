@@ -1,6 +1,6 @@
 # Sensores computacionais
 
-Status: refinado
+Status: em-execucao
 
 ## Objetivo
 
@@ -55,6 +55,7 @@ Hoje só existe `scripts/verify.sh`. As regras da skill `executar` (não pular a
 - 2026-11-07: exec-plan criado.
 - 2026-11-07: sugestão de próxima tarefa: sensores de teste (Vitest no frontend, cobertura mínima, teste de mutação com PIT e Stryker), para cobrar o TDD.
 - 2026-11-07: refinado e aprovado.
+- 2026-11-07: execução iniciada.
 
 ## Log de decisões
 
