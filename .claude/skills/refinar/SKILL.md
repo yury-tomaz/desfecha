@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Você trabalha **com o humano**. O objetivo é deixar um plano pronto para outra sessão executar sem precisar perguntar nada. Você não escreve código nesta skill.
 
-Leia antes: `AGENTS.md`, `docs/PLANS.md`, `docs/PRODUCT_SENSE.md`.
+Leia antes: `AGENTS.md`, `docs/PLANS.md`, `docs/PRODUCT_SENSE.md` e, pelo índice dele, o tema de `docs/produto/` em que a tarefa toca.
 
 ## Entrada
 
@@ -23,7 +23,8 @@ Leia antes: `AGENTS.md`, `docs/PLANS.md`, `docs/PRODUCT_SENSE.md`.
    - O contexto tem tudo o que uma sessão **sem memória desta conversa** precisa e não está no código?
    - Cada critério de aceite é verificável e diz como (teste ou comando)?
    - O "fora de escopo" fecha as portas óbvias de aumento de escopo?
-   - O plano conflita com `docs/PRODUCT_SENSE.md` ou com algum plano em `active/`?
+   - O plano conflita com `docs/PRODUCT_SENSE.md`, com o tema de `docs/produto/` ou com algum plano em `active/`?
+   - A tarefa toma uma decisão de produto que vale além dela? Se sim, a decisão vai para o tema certo de `docs/produto/` (em "Decisões", com data e motivo, e o "Estado atual" atualizado), e não só no plano. Se nenhum tema cabe, crie um e o liste no índice de `docs/PRODUCT_SENSE.md`. O plano aponta para o tema.
    - A tarefa é pequena o bastante para uma execução só? Se não for, proponha dividir.
 3. Leve ao humano **uma pergunta por vez**, curta, com a sua recomendação. Decisões técnicas que quem executa pode tomar sozinho não viram pergunta: deixe para o log de decisões da execução.
 4. Atualize o plano com cada resposta.

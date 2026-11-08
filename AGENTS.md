@@ -11,6 +11,7 @@ Base do harness. Não proponha tarefas de produto até a base estar pronta: o hu
 ## Onde está cada coisa
 
 - `docs/PRODUCT_SENSE.md`: por que o produto existe e o que é "bom" aqui. Leia antes de decisões de produto ou de modelagem.
+- `docs/produto/`: um arquivo por tema de produto, com o estado atual, as decisões e as perguntas em aberto. O índice está no `PRODUCT_SENSE.md`.
 - `docs/SECURITY.md`: ameaças cobertas e não cobertas, onde está cada checagem, como registrar uma exceção. Leia antes de adicionar dependência ou quando uma checagem de segurança falhar.
 - `docs/PLANS.md`: como o trabalho é planejado e registrado.
 - `docs/exec-plans/active/`: tarefas em andamento. Comece por aqui.
@@ -18,6 +19,7 @@ Base do harness. Não proponha tarefas de produto até a base estar pronta: o hu
 - `.claude/skills/refinar` e `.claude/skills/executar`: como um plano é refinado e executado.
 - `.claude/skills/revisar`: como um PR é revisado.
 - `scripts/plan-check.sh <plano>`: verifica se um plano tem a estrutura mínima.
+- `prototipo/`: protótipo navegável da plataforma, em HTML, CSS e JS puros, sem build nem dependências. Vai na frente do `frontend/`, que não importa nada dele. Leia `prototipo/README.md` antes de mexer.
 - `backend/`: Spring Boot (Maven Wrapper). `frontend/`: SvelteKit com TypeScript.
 
 ## Comandos
