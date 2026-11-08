@@ -46,8 +46,11 @@ if ! mise exec -- actionlint || ! mise exec -- zizmor --offline --no-progress .g
   exit 1
 fi
 
-step "backend: build, testes e formatação (mvnw verify)"
-mise exec -- ./backend/mvnw -B -q -f backend/pom.xml verify
+step "backend: build, testes, cobertura e formatação (mvnw verify)"
+if ! mise exec -- ./backend/mvnw -B -q -f backend/pom.xml verify; then
+  echo "Como corrigir: siga o erro acima. Se foi a cobertura (jacoco-maven-plugin:check, Coverage checks have not been met), o mínimo é 80% de linhas e de branches no total do código de produção, menos BackendApplication: backend/target/site/jacoco/jacoco.csv diz, por classe, as linhas (LINE_MISSED) e os branches (BRANCH_MISSED) sem teste, e backend/target/site/jacoco/jacoco.xml diz quais linhas (<line nr=... mi ou mb maior que 0>). Escreva testes de comportamento para elas." >&2
+  exit 1
+fi
 
 step "frontend: dependências"
 (cd frontend && mise exec -- pnpm install --frozen-lockfile --silent)
