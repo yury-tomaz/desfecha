@@ -24,35 +24,38 @@ final class CommentedCodeDetector {
 
   private static List<Comment> comments(String source) {
     List<Comment> comments = new ArrayList<>();
-    int line = 1;
     int i = 0;
     while (i < source.length()) {
-      char c = source.charAt(i);
-      if (source.startsWith("//", i)) {
-        int end = endOfLine(source, i);
-        comments.add(new Comment(line, source.substring(i + 2, end)));
-        i = end;
-      } else if (source.startsWith("/*", i)) {
-        int end = endOf(source, i + 2, "*/");
-        if (!isJavadoc(source, i)) {
-          addBlockLines(comments, line, source.substring(i + 2, end));
-        }
-        line += count(source, i, end, '\n');
-        i = end;
-      } else if (source.startsWith("\"\"\"", i)) {
-        int end = endOfQuoted(source, i + 3, "\"\"\"");
-        line += count(source, i, end, '\n');
-        i = end;
-      } else if (c == '"' || c == '\'') {
-        i = endOfQuoted(source, i + 1, String.valueOf(c));
-      } else {
-        if (c == '\n') {
-          line++;
-        }
-        i++;
-      }
+      i = readToken(source, i, comments);
     }
     return comments;
+  }
+
+  private static int readToken(String source, int start, List<Comment> comments) {
+    if (source.startsWith("//", start)) {
+      int end = endOfLine(source, start);
+      comments.add(new Comment(lineAt(source, start), source.substring(start + 2, end)));
+      return end;
+    }
+    if (source.startsWith("/*", start)) {
+      int end = endOf(source, start + 2, "*/");
+      if (!isJavadoc(source, start)) {
+        addBlockLines(comments, lineAt(source, start), source.substring(start + 2, end));
+      }
+      return end;
+    }
+    if (source.startsWith("\"\"\"", start)) {
+      return endOfQuoted(source, start + 3, "\"\"\"");
+    }
+    char c = source.charAt(start);
+    if (c == '"' || c == '\'') {
+      return endOfQuoted(source, start + 1, String.valueOf(c));
+    }
+    return start + 1;
+  }
+
+  private static int lineAt(String source, int index) {
+    return (int) source.substring(0, index).chars().filter(c -> c == '\n').count() + 1;
   }
 
   private static boolean isJavadoc(String source, int start) {
@@ -83,15 +86,5 @@ final class CommentedCodeDetector {
       i += source.charAt(i) == '\\' ? 2 : 1;
     }
     return Math.min(i + quote.length(), source.length());
-  }
-
-  private static int count(String source, int from, int to, char wanted) {
-    int n = 0;
-    for (int i = from; i < to; i++) {
-      if (source.charAt(i) == wanted) {
-        n++;
-      }
-    }
-    return n;
   }
 }
