@@ -1,6 +1,6 @@
 # Mutação
 
-Colina: subindo
+Colina: descendo
 
 ## Objetivo
 
@@ -8,12 +8,12 @@ Teste de mutação nos dois lados (PIT no backend, Stryker no frontend), bloquea
 
 ## Critérios de aceite
 
-- [ ] A lista dos alterados pega só código de produção medido (`backend/src/main/java`, sem `BackendApplication`; `frontend/src/lib/**/*.ts`, sem testes), commitado ou não, contra o merge-base com `origin/main`, e falha com mensagem de como corrigir sem `origin/main`. Comprovado pelos casos de `scripts/mutacao-alterados.test.sh`, rodados pelo `verify.sh`.
-- [ ] No backend, um teste fraco que deixa um mutante vivo faz o `verify.sh` falhar abaixo de 80%, dizendo o mutante, a classe e a linha; com o teste forte, passa. Comprovado com código de exemplo (registro no log de progresso).
-- [ ] No frontend, o mesmo com o Stryker. Comprovado com código de exemplo (registro no log de progresso).
-- [ ] Sem arquivo alterado medido, a mutação passa sem rodar o PIT nem o Stryker. Comprovado por `scripts/verify.sh` neste branch depois de tirar os exemplos.
-- [ ] O CI busca o `origin/main` para o diff. Comprovado pelo `verify.sh` no CI deste branch e pelo log do passo de mutação lá.
-- [ ] A skill `executar` cita o comando de mutação. Comprovado por `grep -n "mutacao" .claude/skills/executar/SKILL.md`.
+- [x] A lista dos alterados pega só código de produção medido (`backend/src/main/java`, sem `BackendApplication`; `frontend/src/lib/**/*.ts`, sem testes), commitado ou não, contra o merge-base com `origin/main`, e falha com mensagem de como corrigir sem `origin/main`. Comprovado pelos casos de `scripts/mutacao-alterados.test.sh`, rodados pelo `verify.sh`.
+- [x] No backend, um teste fraco que deixa um mutante vivo faz o `verify.sh` falhar abaixo de 80%, dizendo o mutante, a classe e a linha; com o teste forte, passa. Comprovado com código de exemplo (registro no log de progresso).
+- [x] No frontend, o mesmo com o Stryker. Comprovado com código de exemplo (registro no log de progresso).
+- [x] Sem arquivo alterado medido, a mutação passa sem rodar o PIT nem o Stryker. Comprovado por `scripts/verify.sh` neste branch depois de tirar os exemplos.
+- [x] O CI busca o `origin/main` para o diff. Comprovado pelo `verify.sh` no CI deste branch e pelo log do passo de mutação lá.
+- [x] A skill `executar` cita o comando de mutação. Comprovado por `grep -n "mutacao" .claude/skills/executar/SKILL.md`.
 
 ## Log de progresso
 
@@ -25,6 +25,9 @@ Teste de mutação nos dois lados (PIT no backend, Stryker no frontend), bloquea
 - 2026-11-08: o Stryker trouxe o `qs` 6.15.1 (via `typed-rest-client`), com 4 vulnerabilidades conhecidas no OSV-Scanner; corrigido com override (D10).
 - 2026-11-08: os passos de mutação foram para o fim do `verify.sh`: antes do `pnpm install` do frontend, no CI o Stryker ainda não estaria instalado.
 - 2026-11-08: bug no primeiro push. O hook de pre-push roda com `GIT_DIR` definido, e o `mutacao-alterados.test.sh` não o limpava: os comandos git dos casos foram para o repositório de verdade (um commit `base` no topo deste branch, um branch `escopo`, o `origin/main` local movido, o índice do worktree trocado e `core.bare = true` no `.git/config`). Nada foi publicado: o `verify.sh` falhou e o push parou. Estado local desfeito à mão (`core.bare` de volta a `false`, branch de volta ao último commit, `escopo` apagado, `git fetch` do `origin/main`). Reproduzido com um repositório isca em `GIT_DIR`; corrigido com o mesmo `unset $(git rev-parse --local-env-vars)` do `segredos-check.test.sh`, e a isca ficou intacta. Caso novo: com `GIT_DIR` de outro repositório, o script lista o repositório certo.
+- 2026-11-08: colina descendo. Os dois lados medem, barram e passam vazios; resta conferir o CI e concluir.
+- 2026-11-08: CI deste branch (run 42496812231) verde: o checkout trouxe `main -> origin/main`, e o passo de mutação imprimiu `nenhum código de produção alterado em relação ao origin/main: a mutação não roda`, sem falhar por falta de base. Local, `scripts/verify.sh` ok sem os exemplos. `scripts/refactor-check.sh` sem achado novo.
+- 2026-11-08: escopo concluído.
 
 ## Log de decisões
 
