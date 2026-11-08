@@ -78,6 +78,7 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 - **D10. Dockerfiles multi-stage (JDK/Node para build, JRE/Node slim para rodar)**: imagem final menor e sem ferramentas de build. O build da imagem pula testes e Spotless, que já são cobertos por `verify.sh`.
 - **D11. Portas 8080 (backend) e 3000 (frontend), e `name: suportedesk` no compose**: portas padrão de cada stack; o nome fixo evita que o projeto Docker mude de nome conforme a pasta (worktree ou checkout principal).
 - **D12. CI com `jdx/mise-action`, rodando só `scripts/verify.sh`**: instala exatamente as versões do `mise.toml`, e o CI executa o mesmo comando que roda local. Sem cache extra, como o plano pede.
+- **D13. `.gitkeep` em `docs/exec-plans/active/` e `completed/`**: o git não guarda pasta vazia; sem isso `completed/` não existia e `active/` sumiria após este merge, quebrando o `git mv` das skills.
 
 ## Perguntas em aberto
 
