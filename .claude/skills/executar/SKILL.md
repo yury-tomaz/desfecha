@@ -1,6 +1,6 @@
 ---
 name: executar
-description: Constrói um pitch apostado em escopos descobertos durante o trabalho, um PR por escopo empilhados num stack do GitHub, numa worktree isolada, com TDD e o circuit breaker do apetite. Use quando houver um pitch com Estado apostado, ou para continuar um pitch em-build.
+description: Constrói um pitch apostado em escopos descobertos durante o trabalho, um PR por escopo empilhados num stack do GitHub, numa worktree isolada, com TDD e o circuit breaker do apetite. Use quando houver um pitch com Estado apostado, para continuar um pitch em-build, ou para desbloquear um pitch bloqueado quando o humano responde ou corta escopo.
 disable-model-invocation: true
 ---
 
@@ -18,7 +18,7 @@ Leia antes: `AGENTS.md`, `docs/PLANS.md`, e a pasta inteira do pitch (`pitch.md`
 ## 2. Conferir
 
 1. Você precisa estar no `main`, com a árvore limpa. Rode `git pull --ff-only`.
-2. O pitch precisa estar `apostado` (build novo) ou `em-build` (continuação, só quando o humano passou o caminho: é ele quem garante que nenhuma outra sessão está nele). Qualquer outro estado: pare e informe.
+2. O pitch precisa estar `apostado` (build novo), `em-build` (continuação) ou `bloqueado` (desbloqueio, seção 7). Continuação e desbloqueio só quando o humano passou o caminho: é ele quem garante que nenhuma outra sessão está nele. Qualquer outro estado: pare e informe.
 3. Rode `scripts/plan-check.sh <pasta-do-pitch>`. Se falhar: pare, informe o que falta e sugira `/moldar`.
 4. O repositório precisa ter remote (`git remote`). Se não tiver: pare e informe.
 
@@ -124,6 +124,20 @@ Se surgir algo que precisa de julgamento humano (produto, critério de aceite im
 3. No `main`, aplique a mesma troca de estado e a pergunta. Commit (`pitch: bloqueia <slug>`) e push, para o bloqueio ficar visível.
 4. Pare e informe o humano.
 
+### Desbloquear
+
+O humano responde a pergunta e decide. Responder ou cortar escopo continua o build, e é aqui. Voltar ao shaping ou descartar é da `moldar`: se for essa a decisão, pare e indique `/moldar <pasta-do-pitch>`.
+
+Entrada: o caminho do pitch `bloqueado` e a decisão do humano, dita na sessão. Sem decisão, pergunte: não decida por ele.
+
+1. Na worktree do pitch (`git worktree add .worktrees/<slug> <branch>` se não existir, e `gh stack checkout <branch>`), vá ao branch em que a pergunta foi escrita.
+2. Tire a pergunta de "Perguntas em aberto" (do escopo ou do pitch, onde ela estava) e registre-a no log de decisões do mesmo arquivo: `**Dn. <decisão> (AAAA-MM-DD):** <pergunta>; decisão do humano: <resposta>.`
+3. Corte de escopo: o que foi cortado também entra em "No-gos" do pitch, com o motivo do humano.
+4. Troque o pitch para `Estado: em-build`, no mesmo commit da pergunta: o `scripts/plan-check.sh` recusa `bloqueado` sem pergunta. Se o corte deixou o pitch sem nada por construir, troque para `entregue` no topo do stack, pela seção 8, passo 3.
+5. Commit e `gh stack push`. Se o branch não é o topo, `gh stack rebase --upstack` antes do push.
+6. No `main`, aplique a mesma mudança no `pitch.md` (com `em-build`). Commit (`pitch: desbloqueia <slug>`) e push.
+7. Retome o build de onde parou: o escopo que bloqueou, ou o próximo escopo dentro do que sobrou.
+
 ## 8. Concluir um escopo
 
 1. Verifique cada critério de aceite do escopo pelo meio que ele indica, e marque `- [x]`. Se algum não passar, não conclua: corrija ou bloqueie.
@@ -135,7 +149,7 @@ Se surgir algo que precisa de julgamento humano (produto, critério de aceite im
 
 ## Não faça
 
-- Não construa pitch que não esteja `apostado` (ou `em-build`, com o caminho dado pelo humano).
+- Não construa pitch que não esteja `apostado` (ou `em-build` ou `bloqueado`, com o caminho dado pelo humano).
 - Não mexa no `main` além das trocas de estado descritas acima.
 - Não faça merge do PR.
 - Não crie escopo além do apetite.
