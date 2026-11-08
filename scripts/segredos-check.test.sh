@@ -4,6 +4,11 @@ set -euo pipefail
 cd "$(dirname "$0")"
 checagem=$PWD/segredos-check.sh
 
+# O hook de pre-push roda com GIT_DIR do repositório de verdade. Herdado, ele faria o git init e o git add
+# dos repositórios de teste mexerem no índice de verdade.
+# shellcheck disable=SC2046
+unset $(git rev-parse --local-env-vars)
+
 # A chave é montada em tempo de execução para o próprio gitleaks não acusar este arquivo.
 chave_aws="AKIA""QYLPMN5HHHFPZAM2"
 
@@ -83,6 +88,17 @@ description = ""
 paths = ['config\.ini']
 EOF
 confere 1 "exceção no .gitleaks.toml com motivo vazio falha"
+
+novo_repo
+printf 'aws_access_key_id = %s\n' "$chave_aws" >"$repo/config.ini"
+git -C "$repo" add config.ini
+outro=$(mktemp -d)
+git -C "$outro" init -q
+if GIT_DIR=$outro/.git "$checagem" "$repo" >/dev/null 2>&1; then
+  echo "segredos-check: com GIT_DIR de outro repositório no ambiente (como no hook de pre-push), varreu o repositório errado e não achou a chave"
+  falhas=$((falhas + 1))
+fi
+rm -rf "$outro"
 
 novo_repo
 printf 'qualquer:regra:1\n' >"$repo/.gitleaksignore"
