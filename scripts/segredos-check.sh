@@ -19,9 +19,9 @@ fi
 
 sem_motivo=$(awk '
   function fecha() { if (bloco != "" && !motivo) print bloco; bloco = ""; motivo = 0 }
-  /^[[:space:]]*\[/ { fecha() }
-  /^[[:space:]]*\[\[([a-z]+\.)?allowlists\]\]/ { bloco = "linha " NR ": " $0 }
-  bloco != "" && /^[[:space:]]*description[[:space:]]*=[[:space:]]*("[^"]+"|'\''[^'\'']+'\'')/ { motivo = 1 }
+  /^[ \t]*\[/ { fecha() }
+  /^[ \t]*\[\[([a-z]+\.)?allowlists\]\]/ { bloco = "linha " NR ": " $0 }
+  bloco != "" && /^[ \t]*description[ \t]*=[ \t]*("[^"]+"|'\''[^'\'']+'\'')/ { motivo = 1 }
   END { fecha() }
 ' .gitleaks.toml)
 if [ -n "$sem_motivo" ]; then
