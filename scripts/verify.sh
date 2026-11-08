@@ -10,6 +10,12 @@ step() { printf '\n==> %s\n' "$1"; }
 step "harness: casos do hook que bloqueia git push --no-verify"
 mise exec -- .claude/hooks/bloqueia-push-no-verify.test.sh
 
+step "segredos: casos da checagem"
+mise exec -- scripts/segredos-check.test.sh
+
+step "segredos: arquivos versionados e novos (gitleaks)"
+mise exec -- scripts/segredos-check.sh
+
 step "backend: build, testes e formatação (mvnw verify)"
 mise exec -- ./backend/mvnw -B -q -f backend/pom.xml verify
 

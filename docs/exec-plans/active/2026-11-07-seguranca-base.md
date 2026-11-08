@@ -47,8 +47,8 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 
 ## Passos
 
-- [ ] Fixar versões no `mise.toml` (gitleaks, osv-scanner, zizmor, actionlint e o pnpm exato)
-- [ ] gitleaks em `scripts/verify.sh`, com config e regra de exceção
+- [x] Fixar versões no `mise.toml` (gitleaks, osv-scanner, zizmor, actionlint e o pnpm exato)
+- [x] gitleaks em `scripts/verify.sh`, com config e regra de exceção
 - [ ] OSV-Scanner em `scripts/verify.sh`, com `osv-scanner.toml`
 - [ ] Endurecer o pnpm em `frontend/pnpm-workspace.yaml`
 - [ ] `.github/dependabot.yml`
@@ -63,7 +63,14 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - 2026-11-07: sugestão de próxima tarefa: segurança parte 2 (CodeQL, scan de imagem Docker, Dockerfile sem root e imagem base por digest, checklist de segurança na skill `revisar`).
 - 2026-11-07: refinado e aprovado.
 - 2026-11-07: execução iniciada.
+- 2026-11-07: `mise.toml` fixa pnpm 10.34.9, gitleaks 8.30.1, osv-scanner 2.7.0, zizmor 1.32.0 e actionlint 1.7.12.
+- 2026-11-07: gitleaks em `scripts/segredos-check.sh`, com casos em `scripts/segredos-check.test.sh`, os dois rodados pelo `verify.sh`.
+- 2026-11-07: critério da chave falsa. Commit de `backend/src/main/resources/aws.properties` com um access key de AWS de formato real: `scripts/verify.sh` saiu com 1 no passo de segredos, com `RuleID: aws-access-token`, arquivo e linha, e a linha `Como corrigir: tire o valor do arquivo...`. Desfeito o commit e apagado o arquivo: `scripts/verify.sh` saiu com 0.
 
 ## Log de decisões
+
+- **D1. pnpm 10.34.9**: a versão 10 mais nova no mise, publicada em 2026-10-25 (mais de 3 dias, coerente com o `minimumReleaseAge`), e acima do 10.21 que o `trustPolicy` exige.
+- **D2. gitleaks varre os arquivos atuais, não o histórico**: o critério pede que remover a chave faça passar, o que um scan do histórico nunca permitiria. Varre os arquivos versionados e os novos não ignorados (o que pode entrar num commit), copiados para uma pasta temporária para não varrer `node_modules`, `target` e afins. Segredo que já entrou num commit é tratado como vazado: a mensagem manda reescrever o commit antes do push e pedir ao humano a revogação. O histórico já publicado fica com o secret scanning e o push protection do GitHub.
+- **D3. Exceção do gitleaks só em `.gitleaks.toml` com `description`**: `gitleaks:allow` (desligado com `--ignore-gitleaks-allow`) e `.gitleaksignore` (recusado) não guardam motivo. Falso positivo não expira, então não tem prazo.
 
 ## Perguntas em aberto
