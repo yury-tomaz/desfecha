@@ -45,7 +45,7 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 - [x] Frontend SvelteKit mínimo
 - [x] Formatação automática nos dois
 - [x] Comando único de verificação na raiz
-- [ ] Dockerfiles e `docker-compose.yml`
+- [x] Dockerfiles e `docker-compose.yml`
 - [ ] CI no GitHub Actions
 - [ ] Atualizar `AGENTS.md`
 
@@ -58,6 +58,7 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 - 2026-11-07: backend gerado pelo start.spring.io (Spring Boot 4.1.2, web + actuator). `HealthTest` passa com `mvnw verify`.
 - 2026-11-07: frontend gerado com `sv create` 1.3.0 (SvelteKit 3, Svelte 5, Vite 8, TypeScript 6, Prettier). `build`, `check` e `format:check` passam.
 - 2026-11-07: `scripts/verify.sh` e `scripts/format.sh` criados. Provas: Java desformatado → verify sai 1 (Spotless); `+page.svelte` desformatado → sai 1 (Prettier); `HealthTest` quebrado → sai 1 (1 falha); tudo revertido → sai 0. `format.sh` desfaz a desformatação dos dois lados (diff vazio).
+- 2026-11-07: `docker-compose up --build -d` sobe os dois serviços. `curl localhost:8080/actuator/health` → `{"status":"UP",...}` HTTP 200; `curl localhost:3000/` → HTTP 200 com `<h1>SuporteDesk</h1>`.
 
 ## Log de decisões
 
@@ -70,6 +71,8 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 - **D7. Frontend com `adapter-node` em vez de `adapter-auto`**: gera um servidor Node que roda no container Docker.
 - **D8. Script `lint` do template renomeado para `format:check`**: ele só roda Prettier, e lint de verdade é outra tarefa. O nome não engana.
 - **D9. Comandos em `scripts/verify.sh` e `scripts/format.sh`, sempre via `mise exec`**: ficam ao lado de `plan-check.sh`, e usam as versões do `mise.toml` mesmo se o shell não tiver o mise ativado.
+- **D10. Dockerfiles multi-stage (JDK/Node para build, JRE/Node slim para rodar)**: imagem final menor e sem ferramentas de build. O build da imagem pula testes e Spotless, que já são cobertos por `verify.sh`.
+- **D11. Portas 8080 (backend) e 3000 (frontend), e `name: suportedesk` no compose**: portas padrão de cada stack; o nome fixo evita que o projeto Docker mude de nome conforme a pasta (worktree ou checkout principal).
 
 ## Perguntas em aberto
 
