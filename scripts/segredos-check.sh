@@ -21,16 +21,40 @@ if [ -e .gitleaksignore ]; then
     "apague o .gitleaksignore e registre o falso positivo em .gitleaks.toml, num bloco [[allowlists]] com description dizendo por que não é segredo (regras em docs/SECURITY.md)."
 fi
 
-sem_motivo=$(awk '
-  function fecha() { if (bloco != "" && !motivo) print bloco; bloco = ""; motivo = 0 }
-  /^[ \t]*\[/ { fecha() }
-  /^[ \t]*\[\[([a-z]+\.)?allowlists\]\]/ { bloco = "linha " NR ": " $0 }
-  bloco != "" && /^[ \t]*description[ \t]*=[ \t]*("[^"]+"|'\''[^'\'']+'\'')/ { motivo = 1 }
-  END { fecha() }
+# Lista do que é permitido, não do que é proibido: o gitleaks aceita várias outras formas de silenciar
+# uma regra ([allowlist], disabledRules, [[rules]], extend de outro arquivo), e nenhuma delas guarda motivo.
+invalidas=$(awk '
+  function erro(texto) { print "linha " NR ": " texto }
+  function fecha() { if (secao == "allowlists" && !motivo) print "linha " inicio ": [[allowlists]] sem description"; motivo = 0 }
+  em_lista { if ($0 ~ /\][ \t]*(#.*)?$/) em_lista = 0; next }
+  /^[ \t]*(#.*)?$/ { next }
+  /^[ \t]*\[/ {
+    fecha()
+    if ($0 ~ /^[ \t]*\[extend\][ \t]*(#.*)?$/) secao = "extend"
+    else if ($0 ~ /^[ \t]*\[\[allowlists\]\][ \t]*(#.*)?$/) { secao = "allowlists"; inicio = NR }
+    else { secao = "recusada"; erro($0 " não é aceito; só [extend] e [[allowlists]]") }
+    next
+  }
+  /^[ \t]*[A-Za-z]+[ \t]*=/ {
+    chave = $0; sub(/^[ \t]*/, "", chave); sub(/[ \t]*=.*$/, "", chave)
+    valor = $0; sub(/^[^=]*=[ \t]*/, "", valor)
+    if (valor ~ /^\[/ && valor !~ /\][ \t]*(#.*)?$/) em_lista = 1
+    if (secao == "extend") {
+      if (chave == "useDefault" && valor ~ /^true[ \t]*(#.*)?$/) padrao = 1
+      else erro($0 " não é aceito; em [extend] só useDefault = true")
+    } else if (secao == "allowlists") {
+      if (chave == "description") { if (valor ~ /^("[^"]+"|'\''[^'\'']+'\'')/) motivo = 1 }
+      else if (chave !~ /^(paths|regexes|stopwords|commits|regexTarget|condition|targetRules)$/) erro(chave " não é aceito em [[allowlists]]")
+    } else if (secao != "recusada") erro(chave " fora de [extend] e [[allowlists]] não é aceito")
+    next
+  }
+  { erro($0 " não foi entendido") }
+  END { fecha(); if (!padrao) print "falta [extend] com useDefault = true: sem ele as regras padrão não são carregadas" }
 ' .gitleaks.toml)
-if [ -n "$sem_motivo" ]; then
-  falha "Exceção em .gitleaks.toml sem motivo: $sem_motivo" \
-    "toda exceção do gitleaks é só para falso positivo e precisa de description não vazia explicando por que não é segredo (regras em docs/SECURITY.md)."
+if [ -n "$invalidas" ]; then
+  falha "Configuração não aceita em .gitleaks.toml:
+$invalidas" \
+    "o .gitleaks.toml só tem [extend] com useDefault = true e blocos [[allowlists]] com description não vazia explicando por que não é segredo. Exceção é só para falso positivo; desligar ou trocar regra não vale (regras em docs/SECURITY.md)."
 fi
 
 # Varre a cópia dos arquivos versionados e dos novos não ignorados: é o que pode entrar num commit.

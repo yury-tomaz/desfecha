@@ -141,6 +141,71 @@ if GIT_DIR=$outro/.git "$checagem" "$repo" >/dev/null 2>&1; then
 fi
 rm -rf "$outro"
 
+com_chave_e_config() {
+  novo_repo
+  printf 'aws_access_key_id = %s\n' "$chave_aws" >"$repo/config.ini"
+  cat >"$repo/.gitleaks.toml"
+}
+
+com_chave_e_config <<'EOF'
+# exceção válida, com lista em várias linhas
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "valor de exemplo da documentação, não é credencial"
+paths = [
+  '''config\.ini''',
+]
+EOF
+confere 0 "exceção com motivo e lista em várias linhas passa"
+
+com_chave_e_config <<'EOF'
+[extend]
+useDefault = true
+
+[allowlist]
+paths = ['''config\.ini''']
+EOF
+confere 1 "[allowlist] no singular, sem motivo, não é aceito"
+
+com_chave_e_config <<'EOF'
+[extend]
+useDefault = true
+disabledRules = ["aws-access-token"]
+EOF
+confere 1 "disabledRules não é aceito"
+
+com_chave_e_config <<'EOF'
+[extend]
+useDefault = true
+
+[[rules]]
+id = "aws-access-token"
+regex = '''nunca-casa-com-nada'''
+EOF
+confere 1 "[[rules]] sobrescrevendo uma regra padrão não é aceito"
+
+com_chave_e_config <<'EOF'
+[extend]
+useDefault = false
+EOF
+confere 1 "useDefault = false não é aceito"
+
+com_chave_e_config <<'EOF'
+[extend]
+path = "sem-regras.toml"
+EOF
+printf 'title = "sem regras"\n' >"$repo/sem-regras.toml"
+confere 1 "extend de outro arquivo não é aceito"
+
+com_chave_e_config <<'EOF'
+[[allowlists]]
+description = "qualquer coisa"
+paths = ['''nada''']
+EOF
+confere 1 "config sem [extend] useDefault = true não carrega as regras padrão e não é aceita"
+
 novo_repo
 printf 'qualquer:regra:1\n' >"$repo/.gitleaksignore"
 confere 1 ".gitleaksignore não é aceito porque não guarda motivo"
