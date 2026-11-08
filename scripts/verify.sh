@@ -22,6 +22,9 @@ step "frontend: formatação"
 step "frontend: lint (ESLint)"
 (cd frontend && mise exec -- pnpm lint)
 
+step "frontend: testes das regras locais do ESLint"
+(cd frontend && mise exec -- pnpm test:sensores)
+
 step "frontend: tipos"
 (cd frontend && mise exec -- pnpm check)
 

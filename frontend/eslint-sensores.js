@@ -9,8 +9,10 @@ function comMensagem(regra, mensagem, filtro = () => true) {
 		create(context) {
 			const reportados = new Set();
 			const report = ({ node, loc }) => {
-				if (!filtro(node) || reportados.has(node)) return;
-				reportados.add(node);
+				// O sonarjs reporta só com loc, sem node.
+				const chave = node ?? `${loc.start.line}:${loc.start.column}`;
+				if (!filtro(node) || reportados.has(chave)) return;
+				reportados.add(chave);
 				context.report({ node, loc, messageId: 'sensor' });
 			};
 			return regra.create(Object.create(context, { report: { value: report } }));
