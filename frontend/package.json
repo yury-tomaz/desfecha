@@ -17,7 +17,7 @@
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
 		"lint": "eslint .",
-		"test": "vitest run",
+		"test": "vitest run --coverage",
 		"test:sensores": "node --test eslint-sensores.test.js"
 	},
 	"devDependencies": {
@@ -25,6 +25,7 @@
 		"@sveltejs/adapter-node": "^6.0.1",
 		"@sveltejs/kit": "^3.0.0",
 		"@sveltejs/vite-plugin-svelte": "^7.2.0",
+		"@vitest/coverage-v8": "^5.1.0",
 		"eslint": "^10.14.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-sonarjs": "^4.2.2",

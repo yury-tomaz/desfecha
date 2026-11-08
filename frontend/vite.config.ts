@@ -16,6 +16,13 @@ export default defineConfig({
 	],
 	test: {
 		include: ['src/**/*.test.ts'],
-		passWithNoTests: true
+		passWithNoTests: true,
+		coverage: {
+			provider: 'v8',
+			reporter: ['text'],
+			include: ['src/lib/**/*.ts'],
+			exclude: ['src/lib/**/*.test.ts'],
+			thresholds: { lines: 80, branches: 80 }
+		}
 	}
 });
