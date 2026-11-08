@@ -76,6 +76,15 @@ escreve docs/nota.md
 confere 0 "" "BackendApplication, testes, .svelte, src/routes e o que não é código de produção ficam de fora"
 
 base
+escreve backend/src/main/java/com/desfecha/Cobrança.java
+escreve frontend/src/lib/cobrança.ts
+g add -A && g commit -qm acento
+escreve frontend/src/lib/ação.ts
+confere 0 "backend/src/main/java/com/desfecha/Cobrança.java
+frontend/src/lib/ação.ts
+frontend/src/lib/cobrança.ts" "nome com acento entra, commitado ou fora do git, sem as aspas e o escape do git"
+
+base
 g rm -q frontend/src/lib/antigo.ts && g commit -qm apaga
 confere 0 "" "arquivo apagado fica de fora"
 
