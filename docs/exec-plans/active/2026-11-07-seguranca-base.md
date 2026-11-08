@@ -50,7 +50,7 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - [x] Fixar versões no `mise.toml` (gitleaks, osv-scanner, zizmor, actionlint e o pnpm exato)
 - [x] gitleaks em `scripts/verify.sh`, com config e regra de exceção
 - [x] OSV-Scanner em `scripts/verify.sh`, com `osv-scanner.toml`
-- [ ] Endurecer o pnpm em `frontend/pnpm-workspace.yaml`
+- [x] Endurecer o pnpm em `frontend/pnpm-workspace.yaml`
 - [ ] `.github/dependabot.yml`
 - [ ] Actions por SHA, `permissions`, zizmor e actionlint em `scripts/verify.sh`
 - [ ] Regras `deny` de segredos em `.claude/settings.json`
@@ -68,6 +68,8 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - 2026-11-07: critério da chave falsa. Commit de `backend/src/main/resources/aws.properties` com um access key de AWS de formato real: `scripts/verify.sh` saiu com 1 no passo de segredos, com `RuleID: aws-access-token`, arquivo e linha, e a linha `Como corrigir: tire o valor do arquivo...`. Desfeito o commit e apagado o arquivo: `scripts/verify.sh` saiu com 0.
 - 2026-11-07: OSV-Scanner em `scripts/dependencias-check.sh`, que antes confere as exceções com `scripts/dependencias-excecoes-check.sh` (casos em `scripts/dependencias-excecoes-check.test.sh`). O código atual tinha duas vulnerabilidades no frontend, as duas em ferramenta de build: minimatch 10.2.6 (GHSA-g3hv-75wg-m249) e deepmerge 4.3.1 (GHSA-gcqx-w48m-w2h4). Ver D5 e D6.
 - 2026-11-07: critério das dependências. Com `org.apache.commons:commons-text:1.9` no `pom.xml` e `minimist@1.2.5` no `package.json`, `scripts/verify.sh` saiu com 1 listando GHSA-599f-7c49-w659 e GHSA-xvch-5gv4-984h. Exceção para os dois ids em `osv-scanner.toml`: com reason e `ignoreUntil = 2026-11-20` saiu com 0 (`verificação ok`); com `ignoreUntil = 2026-11-01` saiu com 1 (`exceção ... venceu em 2026-11-01`); sem reason saiu com 1 (`exceção ... sem reason`); com `ignoreUntil = 2026-12-08` saiu com 1 (`vai até 2026-12-08, mais de 30 dias depois de hoje`). Dependências de teste removidas depois.
+- 2026-11-07: `frontend/pnpm-workspace.yaml` com `minimumReleaseAge: 4320`, `trustPolicy: no-downgrade` e `blockExoticSubdeps: true`; `pnpm install --frozen-lockfile` passa com o pnpm 10.34.9. Critério da idade mínima: `cd frontend && mise exec -- pnpm add -D hono@4.13.17` (publicada em 2026-11-07T04:56Z) saiu com 1 e `ERR_PNPM_NO_MATURE_MATCHING_VERSION  Version 4.13.17 (released 21 hours ago) of hono does not meet the minimumReleaseAge constraint`; `hono@4.13.16` resolveu normalmente. Nada do teste ficou no `package.json` nem no lockfile.
+- 2026-11-07: observação: `knip@6.44.2`, publicada hoje, já estava no lockfile antes desta tarefa. O `minimumReleaseAge` só age quando o pnpm resolve uma versão nova; o que já está no lockfile não é reavaliado.
 
 ## Log de decisões
 
