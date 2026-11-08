@@ -43,7 +43,7 @@ Hoje só existe `scripts/verify.sh`. As regras da skill `executar` (não pular a
 ## Passos
 
 - [x] Hook de pre-push versionado e ativação de `core.hooksPath`
-- [ ] Bloqueio de `git push --no-verify` em `.claude/settings.json`
+- [x] Bloqueio de `git push --no-verify` em `.claude/settings.json`
 - [ ] ESLint no frontend com os conjuntos recomendados e as regras de código comentado e de TODO
 - [ ] Checagem de código comentado e Checkstyle de TODO no backend
 - [ ] Ligar os lints em `scripts/verify.sh`
@@ -57,10 +57,12 @@ Hoje só existe `scripts/verify.sh`. As regras da skill `executar` (não pular a
 - 2026-11-07: refinado e aprovado.
 - 2026-11-07: execução iniciada.
 - 2026-11-07: hook de pre-push testado num clone limpo (do branch da tarefa, com `git config core.hooksPath .githooks`) empurrando para um remote bare local: commit com `frontend/src/lib/feio.ts` desformatado → push recusado (rc=1, mensagem do hook); numa worktree criada com `git worktree add` a partir do clone → recusado igual (rc=1); sem o arquivo, push passa no clone e na worktree (rc=0).
+- 2026-11-07: bloqueio de `--no-verify` testado passando o JSON de chamada da ferramenta Bash para `.claude/hooks/bloqueia-push-no-verify.sh`. Bloqueadas (rc=2, com mensagem): `git push --no-verify`; `git push origin x --no-verify`; `git push --no-verify origin x`; `git push -u origin plano/x --no-veri`; `git -C /a/b push --no-verif`; `cd x && git push origin main --no-verify`. Liberadas (rc=0): `git push origin x`; `git push --verify`; `git commit --no-verify -m a`; `git commit --no-verify -m a && git push`; `git status; echo --no-verify`. O hook só passa a valer nas sessões abertas no `main` depois do merge, porque o Claude Code lê `.claude/settings.json` da pasta onde a sessão começou.
 
 ## Log de decisões
 
 - **D1. Ativação do hook pelo setup do `AGENTS.md` (`git config core.hooksPath .githooks`), não automática**: as formas automáticas (script `prepare` do pnpm, hook do mise) escondem um efeito colateral no `.git/config` dentro de outro comando e dependem de quem roda qual ferramenta primeiro. Um comando explícito no setup é visível e vale para todas as worktrees.
 - **D2. O hook roda `scripts/verify.sh` na árvore de trabalho, não no commit empurrado**: é o mesmo comando do CI e o agente empurra com a árvore limpa; reproduzir o commit numa árvore temporária custaria um build completo a mais por push.
+- **D3. Bloqueio por hook `PreToolUse`, não por regra `deny`**: o git aceita abreviação de opção longa (`--no-veri` já vale como `--no-verify`, testado), e a opção pode vir em qualquer posição. Uma regra `deny` por prefixo não cobre isso; uma expressão regular num hook cobre. O hook não depende de `jq`.
 
 ## Perguntas em aberto
