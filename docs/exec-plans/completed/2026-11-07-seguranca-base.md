@@ -1,6 +1,6 @@
 # Segurança base: segredos e cadeia de suprimentos
 
-Status: em-execucao
+Status: concluido
 
 ## Objetivo
 
@@ -24,15 +24,15 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 
 ## Critérios de aceite
 
-- [ ] Uma chave falsa com formato real (ex.: um token de AWS de exemplo) num arquivo commitado faz `scripts/verify.sh` falhar com mensagem que diz como corrigir. Remover faz passar. Registrar no log de progresso.
-- [ ] Uma dependência com vulnerabilidade conhecida (uma versão antiga de propósito, no `pom.xml` e no `package.json`) faz `scripts/verify.sh` falhar. Uma exceção no `osv-scanner.toml` com motivo e data futura faz passar. A mesma exceção com data passada volta a falhar, assim como uma exceção sem motivo ou com prazo de mais de 30 dias. Registrar no log de progresso.
-- [ ] `frontend/pnpm-workspace.yaml` tem `minimumReleaseAge`, `trustPolicy` e `blockExoticSubdeps`, e o `mise.toml` fixa um pnpm que aceita todos. Comprovado assim: tentar instalar uma versão publicada há menos de 3 dias é recusado; registrar o comando e a saída no log de progresso.
+- [x] Uma chave falsa com formato real (ex.: um token de AWS de exemplo) num arquivo commitado faz `scripts/verify.sh` falhar com mensagem que diz como corrigir. Remover faz passar. Registrar no log de progresso.
+- [x] Uma dependência com vulnerabilidade conhecida (uma versão antiga de propósito, no `pom.xml` e no `package.json`) faz `scripts/verify.sh` falhar. Uma exceção no `osv-scanner.toml` com motivo e data futura faz passar. A mesma exceção com data passada volta a falhar, assim como uma exceção sem motivo ou com prazo de mais de 30 dias. Registrar no log de progresso.
+- [x] `frontend/pnpm-workspace.yaml` tem `minimumReleaseAge`, `trustPolicy` e `blockExoticSubdeps`, e o `mise.toml` fixa um pnpm que aceita todos. Comprovado assim: tentar instalar uma versão publicada há menos de 3 dias é recusado; registrar o comando e a saída no log de progresso.
 - [x] `.github/dependabot.yml` cobre `maven`, `npm` e `github-actions`, com cooldown. Comprovado lendo o arquivo. Ligar Dependabot alerts e security updates no GitHub é passo do humano: fica listado em `docs/SECURITY.md` e na descrição do PR, com o comando `gh api` que confere.
-- [ ] Todas as actions em `.github/workflows/` estão fixadas por SHA completo, os workflows declaram `permissions`, e zizmor e actionlint rodam em `scripts/verify.sh`. Comprovado assim: trocar um SHA por tag faz a verificação falhar; reverter faz passar.
-- [ ] `.claude/settings.json` impede o agente de ler `.env`, `~/.ssh` e `~/.aws`. Comprovado listando no log de progresso as formas testadas (ex.: `Read` de `.env`, `cat .env`, `cat ~/.ssh/id_ed25519`) e o resultado de cada uma.
+- [x] Todas as actions em `.github/workflows/` estão fixadas por SHA completo, os workflows declaram `permissions`, e zizmor e actionlint rodam em `scripts/verify.sh`. Comprovado assim: trocar um SHA por tag faz a verificação falhar; reverter faz passar.
+- [x] `.claude/settings.json` impede o agente de ler `.env`, `~/.ssh` e `~/.aws`. Comprovado listando no log de progresso as formas testadas (ex.: `Read` de `.env`, `cat .env`, `cat ~/.ssh/id_ed25519`) e o resultado de cada uma.
 - [x] `docs/SECURITY.md` existe, em português, e traz: as ameaças que esta base cobre e as que ainda não cobre; cada camada e onde está configurada; como registrar uma exceção; as configurações esperadas do GitHub e o comando `gh api` que as confere; como reportar uma vulnerabilidade. Comprovado lendo o arquivo.
-- [ ] `AGENTS.md` aponta para `docs/SECURITY.md`. A skill `executar` traz a regra de dependência nova e a de exceção com prazo. Comprovado lendo os dois arquivos.
-- [ ] O código atual passa em todas as checagens novas e `scripts/verify.sh` passa local e no CI. Comprovado com `gh run list` no push do branch da tarefa.
+- [x] `AGENTS.md` aponta para `docs/SECURITY.md`. A skill `executar` traz a regra de dependência nova e a de exceção com prazo. Comprovado lendo os dois arquivos.
+- [x] O código atual passa em todas as checagens novas e `scripts/verify.sh` passa local e no CI. Comprovado com `gh run list` no push do branch da tarefa.
 
 ## Fora de escopo
 
@@ -78,6 +78,8 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - 2026-11-07: bug achado no push do branch: o hook de pre-push roda com `GIT_DIR` do repositório, o `segredos-check.test.sh` herdou a variável e o `git init`/`git add` dos repositórios de teste trocaram o índice da worktree pelo deles (todos os arquivos como apagados, `LEIA.md` adicionado). Nada foi perdido: o commit seguinte refez o índice a partir dos arquivos. Reproduzido contra um repositório isca: sem a correção, o índice dela ficou com `.gitignore .gitleaks.toml LEIA.md`; com a correção, vazio. Corrigido com `unset $(git rev-parse --local-env-vars)` no início do teste, e um caso novo confere a checagem com `GIT_DIR` de outro repositório no ambiente.
 - 2026-11-08: `docs/SECURITY.md` escrito. Estado das configurações do GitHub conferido com `gh api`: secret scanning e push protection ligados; Dependabot alerts (404 em `vulnerability-alerts`), security updates e private vulnerability reporting desligados. Os três ficam como passo do humano.
 - 2026-11-08: `AGENTS.md` aponta para `docs/SECURITY.md`; a skill `executar` ganhou a regra de dependência nova e a de exceção com prazo.
+- 2026-11-08: critério do CI: `gh run list --branch plano/seguranca-base` mostra os runs 42440523186 e 42440951643 com `completed success`; no último, o passo `zizmor com as auditorias online` e o `scripts/verify.sh` (segredos, exceções, OSV-Scanner `No issues found`, zizmor e actionlint) passaram.
+- 2026-11-08: concluído.
 
 ## Log de decisões
 
