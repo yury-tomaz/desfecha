@@ -29,7 +29,7 @@ export default {
 		// Só conta em maiúsculas: "todo" em minúsculas é palavra comum em português.
 		'todo-sem-plano': comMensagem(
 			builtinRules.get('no-warning-comments'),
-			'TODO ou FIXME sem exec-plan. Escreva no formato TODO(<slug-do-plano>): texto, com o nome do arquivo do plano sem .md (ex.: TODO(2026-11-07-sensores-computacionais): ...), ou apague o comentário.',
+			'TODO ou FIXME sem pitch. Escreva no formato TODO(<pasta-do-pitch>): texto, com o nome da pasta do pitch em docs/pitches (ex.: TODO(2026-11-08-sensores-de-teste): ...), ou apague o comentário.',
 			(comentario) => TODO_SEM_PLANO.test(comentario.value)
 		)
 	}

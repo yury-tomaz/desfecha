@@ -34,6 +34,12 @@ scripts/prototipo-check.test.sh
 step "protótipo: sem dependências e fora dos imports do frontend"
 scripts/prototipo-check.sh
 
+step "pitches: casos da checagem"
+scripts/plan-check.test.sh
+
+step "pitches: estrutura de pitch e escopos em docs/pitches"
+scripts/plan-check.sh
+
 step "workflows: actionlint e zizmor"
 if ! mise exec -- actionlint || ! mise exec -- zizmor --offline --no-progress .github/workflows; then
   echo "Como corrigir: siga o help de cada achado acima. Toda action vai fixada pelo SHA completo do commit com a tag em comentário (uses: dono/action@<sha de 40 caracteres> # v1.2.3; o SHA sai de gh api repos/<dono>/<action>/commits/<tag> --jq .sha), o workflow declara permissions mínimas e o checkout usa persist-credentials: false (regras em docs/SECURITY.md)." >&2

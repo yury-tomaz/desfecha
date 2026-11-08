@@ -52,7 +52,7 @@ problemas=$(awk -v hoje="$hoje" '
 if [ -n "$problemas" ]; then
   echo "Exceção inválida em $config:" >&2
   echo "$problemas" >&2
-  echo "Como corrigir: atualize a biblioteca para a versão corrigida, se houver. Se não der, cada exceção é um bloco [[IgnoredVulns]] com id, reason (por que é aceitável por enquanto) e ignoreUntil = AAAA-MM-DD sem aspas, no máximo 30 dias depois de hoje, e o motivo vai também no log de decisões do plano (regras em docs/SECURITY.md)." >&2
+  echo "Como corrigir: atualize a biblioteca para a versão corrigida, se houver. Se não der, cada exceção é um bloco [[IgnoredVulns]] com id, reason (por que é aceitável por enquanto) e ignoreUntil = AAAA-MM-DD sem aspas, no máximo 30 dias depois de hoje, e o motivo vai também no log de decisões do escopo (regras em docs/SECURITY.md)." >&2
   exit 1
 fi
 echo "exceções de dependência ok"

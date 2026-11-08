@@ -28,7 +28,7 @@ referencias=$(sed '/^$/d' <<<"$referencias")
 if [ -n "$referencias" ]; then
   echo "O frontend/ referencia o prototipo/:" >&2
   echo "$referencias" | sed 's/^/  /' >&2
-  echo "Como corrigir: o frontend/ não importa nada do prototipo/, nem por alias, url() de CSS ou symlink. Apague o symlink, se for o caso. Reescreva no frontend/ o que precisar da tela, e aponte a tela do protótipo no exec-plan (regras em prototipo/README.md)." >&2
+  echo "Como corrigir: o frontend/ não importa nada do prototipo/, nem por alias, url() de CSS ou symlink. Apague o symlink, se for o caso. Reescreva no frontend/ o que precisar da tela, e aponte a tela do protótipo no pitch (regras em prototipo/README.md)." >&2
   falhou=1
 fi
 
