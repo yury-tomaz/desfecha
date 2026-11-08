@@ -18,6 +18,7 @@ Todo o código daqui é escrito por agentes. Esta base cobre os riscos que mais 
 | Workflow com permissão demais ou token persistido | `permissions: contents: read` e `persist-credentials: false`, conferidos pelo zizmor |
 | Agente lê `.env` ou credenciais da máquina | regras `deny` em `.claude/settings.json` |
 | Ferramenta de segurança trocada por versão maliciosa | versões exatas no `mise.toml` |
+| Histórico do `main` reescrito ou branch apagado (force-push de agente, por engano) | ruleset `main` no GitHub: bloqueia force-push e exclusão, sem bypass, nem para o dono |
 
 ### Ainda não cobertas
 
@@ -27,6 +28,7 @@ Todo o código daqui é escrito por agentes. Esta base cobre os riscos que mais 
 - Segredo que já está no `origin/main`: o gitleaks olha os arquivos e os commits que ainda não estão lá. O que já foi publicado depende do secret scanning do GitHub, que só reconhece padrões de provedor (senha ou segredo genérico passam, com non-provider patterns desligado).
 - Dependência que já está no lockfile não é reavaliada pela idade mínima do pnpm; só o OSV-Scanner a confere.
 - Checklist de segurança na revisão de PR (skill `revisar`).
+- Push direto no `main` sem PR nem CI verde: o ruleset não exige PR nem check, porque a skill `executar` faz commit direto no `main` (reserva e bloqueio de pitch) e só há um humano, que não pode aprovar o próprio PR. O que segura é o hook de pre-push com o `verify.sh`. Quando entrar outra pessoa, exigir PR e o check `verify`.
 - Isolamento entre tenants, LGPD e limites de ação da IA: são decisões de produto.
 
 ## Camadas
@@ -41,6 +43,7 @@ Todo o código daqui é escrito por agentes. Esta base cobre os riscos que mais 
 | Workflows | zizmor, actionlint | `scripts/verify.sh` (zizmor offline) e `.github/workflows/verify.yml` (zizmor online, com `GH_TOKEN` só nesse passo) |
 | Agente | Claude Code | `.claude/settings.json` (`permissions.deny`) |
 | Versões das ferramentas | mise | `mise.toml` |
+| Branch principal | ruleset do GitHub | fora do repositório: `gh api repos/{owner}/{repo}/rulesets` (regras `deletion` e `non_fast_forward` no branch padrão) |
 
 O backend é escaneado pela árvore que o Maven resolve (`mvnw dependency:list`), com as dependências transitivas. O OSV-Scanner lendo o `pom.xml` direto não vê as versões que vêm do parent do Spring Boot.
 
