@@ -52,12 +52,6 @@ if ! mise exec -- ./backend/mvnw -B -q -f backend/pom.xml verify; then
   exit 1
 fi
 
-step "mutação: casos da lista de alterados"
-scripts/mutacao-alterados.test.sh
-
-step "mutação: código de produção alterado em relação ao origin/main (PIT e Stryker)"
-scripts/mutacao-check.sh
-
 step "frontend: dependências"
 (cd frontend && mise exec -- pnpm install --frozen-lockfile --silent)
 
@@ -81,5 +75,11 @@ step "frontend: tipos"
 
 step "frontend: build"
 (cd frontend && mise exec -- pnpm build)
+
+step "mutação: casos da lista de alterados"
+scripts/mutacao-alterados.test.sh
+
+step "mutação: código de produção alterado em relação ao origin/main (PIT e Stryker)"
+scripts/mutacao-check.sh
 
 printf '\nverificação ok\n'

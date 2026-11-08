@@ -7,7 +7,7 @@ import ts from 'typescript-eslint';
 import sensores from './eslint-sensores.js';
 
 export default ts.config(
-	{ ignores: ['.svelte-kit/', 'build/', 'node_modules/'] },
+	{ ignores: ['.svelte-kit/', '.stryker-tmp/', 'build/', 'node_modules/'] },
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs.recommended,
