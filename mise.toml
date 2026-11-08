@@ -2,3 +2,4 @@
 java = "temurin-21"
 node = "22"
 pnpm = "10"
+jq = "1.8"

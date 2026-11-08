@@ -8,7 +8,7 @@ cd "$(dirname "$0")/.."
 step() { printf '\n==> %s\n' "$1"; }
 
 step "harness: casos do hook que bloqueia git push --no-verify"
-.claude/hooks/bloqueia-push-no-verify.test.sh
+mise exec -- .claude/hooks/bloqueia-push-no-verify.test.sh
 
 step "backend: build, testes e formatação (mvnw verify)"
 mise exec -- ./backend/mvnw -B -q -f backend/pom.xml verify

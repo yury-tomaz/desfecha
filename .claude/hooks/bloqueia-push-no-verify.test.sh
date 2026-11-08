@@ -3,6 +3,11 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+if ! command -v jq >/dev/null; then
+  echo "jq não encontrado. Rode pelo mise (mise install; mise exec -- $0), que fixa a versão no mise.toml."
+  exit 1
+fi
+
 falhas=0
 TAB=$'\t'
 
@@ -42,6 +47,24 @@ libera 'git commit --no-verify -m a && git push'
 libera 'git status; echo --no-verify'
 libera "git commit --no-verify -m a
 git push"
+
+# Sem jq no PATH o hook procura no JSON cru. O JSON vai escrito à mão, como o Claude Code manda.
+sem_jq=$(mktemp -d)
+trap 'rm -rf "$sem_jq"' EXIT
+for ferramenta in cat tr grep; do ln -s "$(command -v "$ferramenta")" "$sem_jq/$ferramenta"; done
+
+confere_sem_jq() {
+  local esperado=$1 json=$2 rc=0
+  PATH=$sem_jq "$BASH" ./bloqueia-push-no-verify.sh <<<"$json" 2>/dev/null || rc=$?
+  if [ "$rc" -ne "$esperado" ]; then
+    echo "Hook de --no-verify sem jq: esperava rc=$esperado e saiu rc=$rc para: $json"
+    falhas=$((falhas + 1))
+  fi
+}
+
+confere_sem_jq 2 '{"tool_input":{"command":"git push \"--no-verify\""}}'
+confere_sem_jq 2 '{"tool_input":{"command":"git push origin x\t--no-verify"}}'
+confere_sem_jq 0 '{"tool_input":{"command":"git push origin x"}}'
 
 if [ "$falhas" -gt 0 ]; then
   echo "$falhas caso(s) do hook falharam. Corrija .claude/hooks/bloqueia-push-no-verify.sh, não os casos."
