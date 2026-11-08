@@ -58,6 +58,37 @@ printf 'Nada de `<script src="https://...">` aqui.\n' >"$raiz/prototipo/README.m
 confere 0 "documentação que cita a regra não é conferida"
 
 base
+printf '@import url(../../prototipo/estilo.css);\n' >"$raiz/frontend/src/app.css"
+confere 1 "url() sem aspas para o protótipo num .css falha"
+
+base
+printf '<style>\n\t@import url( ../../../prototipo/estilo.css );\n</style>\n' >>"$raiz/frontend/src/routes/+page.svelte"
+confere 1 "url() sem aspas para o protótipo num .svelte falha"
+
+base
+printf '.a { background: url(img/prototipo-fundo.png); }\n' >"$raiz/frontend/src/app.css"
+confere 0 "url() com prototipo só no nome de um arquivo passa"
+
+base
+mkdir -p "$raiz/frontend/src/lib"
+ln -s ../../../prototipo "$raiz/frontend/src/lib/telas"
+printf 'import "$lib/telas/estilo.css";\n' >>"$raiz/frontend/src/routes/pagina.ts"
+confere 1 "symlink no frontend apontando para o protótipo falha"
+
+base
+ln -s ../../prototipo/index.html "$raiz/frontend/src/inicio.html"
+confere 1 "symlink no frontend apontando para um arquivo do protótipo falha"
+
+base
+mkdir -p "$raiz/frontend/src/lib/outro"
+ln -s outro "$raiz/frontend/src/lib/atalho"
+confere 0 "symlink no frontend que não aponta para o protótipo passa"
+
+base
+ln -s ../../../prototipo "$raiz/frontend/node_modules/pacote/telas"
+confere 0 "symlink dentro de node_modules não é conferido"
+
+base
 printf '{ "name": "prototipo" }\n' >"$raiz/prototipo/package.json"
 confere 1 "package.json no protótipo falha"
 
@@ -81,6 +112,22 @@ confere 1 "script sem protocolo (//) no protótipo falha"
 base
 printf 'import { h } from "https://esm.sh/preact";\n' >>"$raiz/prototipo/tela.js"
 confere 1 "import de URL num .js do protótipo falha"
+
+base
+printf '<script\n  type="module"\n  src="https://cdn.jsdelivr.net/npm/alpinejs"\n></script>\n' >>"$raiz/prototipo/index.html"
+confere 1 "script de https com os atributos em várias linhas falha"
+
+base
+printf '<script\n  type="module"\n  src="tela.js"\n></script>\n<a\n  href="https://exemplo.com">link</a>\n' >>"$raiz/prototipo/index.html"
+confere 0 "script local em várias linhas e link externo passam"
+
+base
+printf '<script type="importmap">{"imports":{"preact":"https://esm.sh/preact"}}</script>\n<script type="module">import { h } from "preact";</script>\n' >>"$raiz/prototipo/index.html"
+confere 1 "import map no protótipo falha"
+
+base
+printf "<script\n  type='importmap'>{}</script>\n" >>"$raiz/prototipo/index.html"
+confere 1 "import map com aspas simples e em outra linha falha"
 
 if [ "$falhas" -gt 0 ]; then
   echo "$falhas caso(s) de prototipo-check falharam. Corrija scripts/prototipo-check.sh, não os casos."
