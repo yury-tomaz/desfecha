@@ -1,6 +1,6 @@
 # Sensores computacionais
 
-Status: em-execucao
+Status: concluido
 
 ## Objetivo
 
@@ -25,10 +25,10 @@ Hoje só existe `scripts/verify.sh`. As regras da skill `executar` (não pular a
 - [x] `.claude/settings.json` impede o agente de rodar `git push --no-verify`. Comprovado listando no log de progresso as formas testadas (ex.: `git push --no-verify`, `git push origin x --no-verify`) e o resultado de cada uma.
 - [x] Código comentado faz `scripts/verify.sh` falhar no frontend (`eslint-plugin-sonarjs`, regra `no-commented-code`) e no backend (teste estrutural ou script com heurística). Comprovado assim: um trecho de código comentado num `.ts`, num `.svelte` e num `.java` faz a verificação falhar com mensagem que diz como corrigir; um comentário de "porquê" em prosa não faz; reverter faz passar.
 - [x] TODO sem referência a exec-plan faz `scripts/verify.sh` falhar (Checkstyle `TodoComment` no backend, `no-warning-comments` no frontend). Comprovado assim: um TODO sem referência falha com mensagem que diz como corrigir; um TODO no formato aceito passa.
-- [ ] `pnpm lint` roda o ESLint com os conjuntos recomendados (ver Contexto) e entra em `scripts/verify.sh`. Comprovado assim: um erro de uma regra recomendada (ex.: variável não usada num `.ts`) faz a verificação falhar; reverter faz passar.
+- [x] `pnpm lint` roda o ESLint com os conjuntos recomendados (ver Contexto) e entra em `scripts/verify.sh`. Comprovado assim: um erro de uma regra recomendada (ex.: variável não usada num `.ts`) faz a verificação falhar; reverter faz passar.
 - [x] `scripts/refactor-check.sh` gera um relatório de duplicação (jscpd, Java e TS), código morto (knip no frontend, PMD no backend) e complexidade cognitiva (PMD e ESLint), e sai com 0 mesmo com achados. Comprovado rodando o script com uma duplicação de propósito: ela aparece no relatório e o código de saída é 0.
-- [ ] O código atual passa em todos os lints novos, e `scripts/verify.sh` passa local e no CI. Comprovado com `gh run list` no push do branch da tarefa.
-- [ ] `AGENTS.md` traz o setup do hook, diz que `verify.sh` passa antes de todo push e aponta para `scripts/refactor-check.sh`. A skill `executar` diz "antes de cada push" no lugar de "antes de cada commit", cita `scripts/refactor-check.sh` no passo de refactoring e o formato de TODO aceito. Comprovado lendo os dois arquivos.
+- [x] O código atual passa em todos os lints novos, e `scripts/verify.sh` passa local e no CI. Comprovado com `gh run list` no push do branch da tarefa.
+- [x] `AGENTS.md` traz o setup do hook, diz que `verify.sh` passa antes de todo push e aponta para `scripts/refactor-check.sh`. A skill `executar` diz "antes de cada push" no lugar de "antes de cada commit", cita `scripts/refactor-check.sh` no passo de refactoring e o formato de TODO aceito. Comprovado lendo os dois arquivos.
 
 ## Fora de escopo
 
@@ -64,6 +64,8 @@ Hoje só existe `scripts/verify.sh`. As regras da skill `executar` (não pular a
 - 2026-11-07: o PMD apontou complexidade cognitiva 17 em `CommentedCodeDetector.comments`; refatorado (um token por vez, linha calculada pelo índice), sem mudar testes. No código atual o relatório só aponta `frontend/src/lib/index.ts` (arquivo do template, sem uso) no knip.
 - 2026-11-07: critérios verificados por `scripts/verify.sh`, um caso por vez, revertendo cada um. Falharam (rc=1) com a mensagem de como corrigir: código comentado num `.ts`, num `.svelte` e num `.java`; `// TODO: arrumar` num `.ts` e num `.java`; `// FIXME ver depois` num `.svelte`. Passaram (rc=0): comentário de "porquê" em prosa nos três; `TODO(2026-11-07-sensores-computacionais): ...` e `FIXME(...)` no formato aceito nos três; a árvore revertida. Variável não usada num `.ts` fez a verificação falhar em `pnpm lint` (`@typescript-eslint/no-unused-vars`) e o revertido passou.
 - 2026-11-07: sugestões de próxima tarefa: (1) apagar `frontend/src/lib/index.ts` e o import `#lib` sem uso apontados pelo knip, se o humano não quiser manter o padrão do template; (2) fechar outros desvios do hook de pre-push, como `git -c core.hooksPath=... push`, que o bloqueio desta tarefa não cobre (o escopo era `--no-verify`).
+- 2026-11-07: o push do branch passou pelo hook de pre-push, e o CI passou (`gh run list`: run 42436129092, `verify`, success). `AGENTS.md` e a skill `executar` conferidos: setup do hook, "antes de todo push", `scripts/refactor-check.sh` e formato de TODO.
+- 2026-11-07: concluído.
 
 ## Log de decisões
 
