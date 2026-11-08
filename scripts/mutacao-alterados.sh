@@ -17,7 +17,9 @@ if ! git rev-parse --verify -q origin/main >/dev/null; then
 fi
 
 base=$(git merge-base HEAD origin/main)
-alterados=$(git diff --name-only --diff-filter=ACMR "$base" && git ls-files --others --exclude-standard)
+# Com o core.quotePath padrão, nome com acento sai entre aspas e com escape octal, e o filtro o descartaria.
+alterados=$(git -c core.quotePath=false diff --name-only --diff-filter=ACMR "$base" &&
+  git -c core.quotePath=false ls-files --others --exclude-standard)
 # BackendApplication fica fora como na cobertura: o único código dela é o main(), que nenhum teste chama.
 awk '
   /^backend\/src\/main\/java\/com\/desfecha\/BackendApplication\.java$/ { next }
