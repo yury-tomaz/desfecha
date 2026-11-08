@@ -39,8 +39,38 @@ confere() {
   fi
 }
 
+commita() { git -C "$repo" -c user.name=teste -c user.email=teste@exemplo.invalid commit -q --allow-empty -m "$1"; }
+publica() { git -C "$repo" update-ref refs/remotes/origin/main HEAD; }
+
 novo_repo
 confere 0 "repositório sem segredo passa"
+
+novo_repo
+commita base
+publica
+printf 'aws_access_key_id = %s\n' "$chave_aws" >"$repo/config.ini"
+git -C "$repo" add config.ini
+commita "com a chave"
+git -C "$repo" rm -q config.ini
+commita "tira a chave"
+confere 1 "chave commitada e removida num commit seguinte ainda não publicado falha"
+
+novo_repo
+printf 'aws_access_key_id = %s\n' "$chave_aws" >"$repo/config.ini"
+git -C "$repo" add config.ini
+commita "com a chave"
+publica
+git -C "$repo" rm -q config.ini
+commita "tira a chave"
+confere 0 "chave que já estava no origin/main e foi removida depois passa"
+
+novo_repo
+printf 'aws_access_key_id = %s\n' "$chave_aws" >"$repo/config.ini"
+git -C "$repo" add config.ini
+commita "com a chave"
+git -C "$repo" rm -q config.ini
+commita "tira a chave"
+confere 1 "sem origin/main, chave em qualquer commit do histórico falha"
 
 novo_repo
 printf 'aws_access_key_id = %s\n' "$chave_aws" >"$repo/config.ini"
@@ -96,6 +126,17 @@ outro=$(mktemp -d)
 git -C "$outro" init -q
 if GIT_DIR=$outro/.git "$checagem" "$repo" >/dev/null 2>&1; then
   echo "segredos-check: com GIT_DIR de outro repositório no ambiente (como no hook de pre-push), varreu o repositório errado e não achou a chave"
+  falhas=$((falhas + 1))
+fi
+
+novo_repo
+printf 'aws_access_key_id = %s\n' "$chave_aws" >"$repo/config.ini"
+git -C "$repo" add config.ini
+commita "com a chave"
+git -C "$repo" rm -q config.ini
+commita "tira a chave"
+if GIT_DIR=$outro/.git "$checagem" "$repo" >/dev/null 2>&1; then
+  echo "segredos-check: com GIT_DIR de outro repositório no ambiente (como no hook de pre-push), varreu o histórico errado e não achou a chave"
   falhas=$((falhas + 1))
 fi
 rm -rf "$outro"

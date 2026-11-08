@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
-# Procura segredos (chaves, tokens, senhas) nos arquivos que vão ou podem ir para um commit.
+# Procura segredos (chaves, tokens, senhas) nos arquivos que vão ou podem ir para um commit
+# e nos commits que ainda não estão no origin/main.
 # Uso: scripts/segredos-check.sh [raiz-do-repositório]
 # Casos cobertos: scripts/segredos-check.test.sh.
 set -euo pipefail
 raiz=${1:-"$(cd "$(dirname "$0")/.." && pwd)"}
 cd "$raiz"
+# O hook de pre-push roda com GIT_DIR definido. Herdado, ele apontaria o git para outro repositório que não a raiz.
+# shellcheck disable=SC2046
+unset $(git rev-parse --local-env-vars)
 
 falha() {
   echo "$1" >&2
@@ -41,6 +45,17 @@ git ls-files -z --cached --others --exclude-standard |
 if ! (cd "$copia" && gitleaks dir . --config "$raiz/.gitleaks.toml" --ignore-gitleaks-allow \
   --no-banner --no-color --redact --log-level warn --verbose); then
   falha "Segredo encontrado (arquivo e linha acima, caminhos relativos à raiz do repositório)." \
-    "tire o valor do arquivo e leia de variável de ambiente ou de um .env ignorado pelo git. Se ele já foi commitado, considere vazado: peça ao humano para revogar a credencial, e reescreva o commit antes do push. Se for falso positivo, registre em .gitleaks.toml com description (regras em docs/SECURITY.md)."
+    "tire o valor do arquivo e leia de variável de ambiente ou de um .env ignorado pelo git. Se for falso positivo, registre em .gitleaks.toml com description (regras em docs/SECURITY.md)."
+fi
+# Tirar a chave num commit novo não basta: o commit anterior, com ela, vai junto no push.
+# O que já está no origin/main já foi publicado e fica com o secret scanning do GitHub.
+if git rev-parse -q --verify HEAD >/dev/null; then
+  intervalo=HEAD
+  if git rev-parse -q --verify origin/main >/dev/null; then intervalo=origin/main..HEAD; fi
+  if ! gitleaks git . --log-opts="$intervalo" --config "$raiz/.gitleaks.toml" --ignore-gitleaks-allow \
+    --no-banner --no-color --redact --log-level warn --verbose; then
+    falha "Segredo num commit que ainda não está no origin/main (commit, arquivo e linha acima)." \
+      "apagar o valor num commit novo não basta, o commit antigo vai junto no push. Refaça os commits sem o segredo: git reset --soft origin/main, tire o valor dos arquivos (leia de variável de ambiente ou de um .env ignorado pelo git) e commite de novo. Se algum desses commits já foi para um branch remoto, considere a credencial vazada e peça ao humano para revogá-la. Se for falso positivo, registre em .gitleaks.toml com description (regras em docs/SECURITY.md)."
+  fi
 fi
 echo "nenhum segredo encontrado"
