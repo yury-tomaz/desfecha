@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Comando único de verificação: build, testes, tipos e formatação do backend e do frontend.
+# Comando único de verificação: build, testes, tipos, lint e formatação do backend e do frontend.
 # Uso: scripts/verify.sh
 # Sai com código diferente de zero se qualquer parte falhar.
 set -euo pipefail
@@ -15,6 +15,9 @@ step "frontend: dependências"
 
 step "frontend: formatação"
 (cd frontend && mise exec -- pnpm format:check)
+
+step "frontend: lint (ESLint)"
+(cd frontend && mise exec -- pnpm lint)
 
 step "frontend: tipos"
 (cd frontend && mise exec -- pnpm check)
