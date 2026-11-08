@@ -21,12 +21,12 @@ Hoje só existe `scripts/verify.sh`. As regras da skill `executar` (não pular a
 
 ## Critérios de aceite
 
-- [ ] `.githooks/pre-push` está versionado e chama `scripts/verify.sh`. A ativação de `core.hooksPath` é automática ou está no setup do `AGENTS.md`. Comprovado assim: num clone limpo, depois do setup, um push com um arquivo desformatado é recusado pelo hook; o mesmo vale numa worktree criada com `git worktree add`; com tudo verde o push passa. Registrar no log de progresso.
-- [ ] `.claude/settings.json` impede o agente de rodar `git push --no-verify`. Comprovado listando no log de progresso as formas testadas (ex.: `git push --no-verify`, `git push origin x --no-verify`) e o resultado de cada uma.
-- [ ] Código comentado faz `scripts/verify.sh` falhar no frontend (`eslint-plugin-sonarjs`, regra `no-commented-code`) e no backend (teste estrutural ou script com heurística). Comprovado assim: um trecho de código comentado num `.ts`, num `.svelte` e num `.java` faz a verificação falhar com mensagem que diz como corrigir; um comentário de "porquê" em prosa não faz; reverter faz passar.
-- [ ] TODO sem referência a exec-plan faz `scripts/verify.sh` falhar (Checkstyle `TodoComment` no backend, `no-warning-comments` no frontend). Comprovado assim: um TODO sem referência falha com mensagem que diz como corrigir; um TODO no formato aceito passa.
+- [x] `.githooks/pre-push` está versionado e chama `scripts/verify.sh`. A ativação de `core.hooksPath` é automática ou está no setup do `AGENTS.md`. Comprovado assim: num clone limpo, depois do setup, um push com um arquivo desformatado é recusado pelo hook; o mesmo vale numa worktree criada com `git worktree add`; com tudo verde o push passa. Registrar no log de progresso.
+- [x] `.claude/settings.json` impede o agente de rodar `git push --no-verify`. Comprovado listando no log de progresso as formas testadas (ex.: `git push --no-verify`, `git push origin x --no-verify`) e o resultado de cada uma.
+- [x] Código comentado faz `scripts/verify.sh` falhar no frontend (`eslint-plugin-sonarjs`, regra `no-commented-code`) e no backend (teste estrutural ou script com heurística). Comprovado assim: um trecho de código comentado num `.ts`, num `.svelte` e num `.java` faz a verificação falhar com mensagem que diz como corrigir; um comentário de "porquê" em prosa não faz; reverter faz passar.
+- [x] TODO sem referência a exec-plan faz `scripts/verify.sh` falhar (Checkstyle `TodoComment` no backend, `no-warning-comments` no frontend). Comprovado assim: um TODO sem referência falha com mensagem que diz como corrigir; um TODO no formato aceito passa.
 - [ ] `pnpm lint` roda o ESLint com os conjuntos recomendados (ver Contexto) e entra em `scripts/verify.sh`. Comprovado assim: um erro de uma regra recomendada (ex.: variável não usada num `.ts`) faz a verificação falhar; reverter faz passar.
-- [ ] `scripts/refactor-check.sh` gera um relatório de duplicação (jscpd, Java e TS), código morto (knip no frontend, PMD no backend) e complexidade cognitiva (PMD e ESLint), e sai com 0 mesmo com achados. Comprovado rodando o script com uma duplicação de propósito: ela aparece no relatório e o código de saída é 0.
+- [x] `scripts/refactor-check.sh` gera um relatório de duplicação (jscpd, Java e TS), código morto (knip no frontend, PMD no backend) e complexidade cognitiva (PMD e ESLint), e sai com 0 mesmo com achados. Comprovado rodando o script com uma duplicação de propósito: ela aparece no relatório e o código de saída é 0.
 - [ ] O código atual passa em todos os lints novos, e `scripts/verify.sh` passa local e no CI. Comprovado com `gh run list` no push do branch da tarefa.
 - [ ] `AGENTS.md` traz o setup do hook, diz que `verify.sh` passa antes de todo push e aponta para `scripts/refactor-check.sh`. A skill `executar` diz "antes de cada push" no lugar de "antes de cada commit", cita `scripts/refactor-check.sh` no passo de refactoring e o formato de TODO aceito. Comprovado lendo os dois arquivos.
 
@@ -47,8 +47,8 @@ Hoje só existe `scripts/verify.sh`. As regras da skill `executar` (não pular a
 - [x] ESLint no frontend com os conjuntos recomendados e as regras de código comentado e de TODO
 - [x] Checagem de código comentado e Checkstyle de TODO no backend
 - [x] Ligar os lints em `scripts/verify.sh`
-- [ ] `scripts/refactor-check.sh`
-- [ ] Atualizar `AGENTS.md` e a skill `executar`
+- [x] `scripts/refactor-check.sh`
+- [x] Atualizar `AGENTS.md` e a skill `executar`
 
 ## Log de progresso
 
@@ -60,6 +60,10 @@ Hoje só existe `scripts/verify.sh`. As regras da skill `executar` (não pular a
 - 2026-11-07: bloqueio de `--no-verify` testado passando o JSON de chamada da ferramenta Bash para `.claude/hooks/bloqueia-push-no-verify.sh`. Bloqueadas (rc=2, com mensagem): `git push --no-verify`; `git push origin x --no-verify`; `git push --no-verify origin x`; `git push -u origin plano/x --no-veri`; `git -C /a/b push --no-verif`; `cd x && git push origin main --no-verify`. Liberadas (rc=0): `git push origin x`; `git push --verify`; `git commit --no-verify -m a`; `git commit --no-verify -m a && git push`; `git status; echo --no-verify`. O hook só passa a valer nas sessões abertas no `main` depois do merge, porque o Claude Code lê `.claude/settings.json` da pasta onde a sessão começou.
 - 2026-11-07: ESLint no frontend (flat config, `eslint.config.js`) com `@eslint/js`, `typescript-eslint`, `eslint-plugin-svelte` e `eslint-config-prettier` recomendados, mais as regras locais de `eslint-sensores.js`. O `src/app.d.ts` do template tinha interfaces comentadas e foi limpo. `pnpm lint` entra em `scripts/verify.sh` antes da checagem de tipos.
 - 2026-11-07: backend com o teste estrutural `NoCommentedCodeTest` (detector `CommentedCodeDetector`, com testes de unidade) e o Checkstyle `TodoComment` na fase `verify`.
+- 2026-11-07: `scripts/refactor-check.sh` testado com duplicação de propósito (mesma função em `dup-a.ts`/`dup-b.ts` e em `DupA.java`/`DupB.java`, com uma variável local não usada, e uma função de complexidade 34 em `complexa.ts`): o jscpd listou os dois clones (java e typescript), o knip os arquivos não usados, o PMD a variável não usada, o ESLint a complexidade cognitiva, e o script saiu com 0. As amostras foram apagadas.
+- 2026-11-07: o PMD apontou complexidade cognitiva 17 em `CommentedCodeDetector.comments`; refatorado (um token por vez, linha calculada pelo índice), sem mudar testes. No código atual o relatório só aponta `frontend/src/lib/index.ts` (arquivo do template, sem uso) no knip.
+- 2026-11-07: critérios verificados por `scripts/verify.sh`, um caso por vez, revertendo cada um. Falharam (rc=1) com a mensagem de como corrigir: código comentado num `.ts`, num `.svelte` e num `.java`; `// TODO: arrumar` num `.ts` e num `.java`; `// FIXME ver depois` num `.svelte`. Passaram (rc=0): comentário de "porquê" em prosa nos três; `TODO(2026-11-07-sensores-computacionais): ...` e `FIXME(...)` no formato aceito nos três; a árvore revertida. Variável não usada num `.ts` fez a verificação falhar em `pnpm lint` (`@typescript-eslint/no-unused-vars`) e o revertido passou.
+- 2026-11-07: sugestões de próxima tarefa: (1) apagar `frontend/src/lib/index.ts` e o import `#lib` sem uso apontados pelo knip, se o humano não quiser manter o padrão do template; (2) fechar outros desvios do hook de pre-push, como `git -c core.hooksPath=... push`, que o bloqueio desta tarefa não cobre (o escopo era `--no-verify`).
 
 ## Log de decisões
 
@@ -70,5 +74,6 @@ Hoje só existe `scripts/verify.sh`. As regras da skill `executar` (não pular a
 - **D5. TODO e FIXME só contam em maiúsculas, nos dois lados**: `no-warning-comments` compara sem caixa, e "todo" é palavra comum em português ("o todo do pedido"). O Checkstyle já compara com caixa.
 - **D6. Limites conhecidos do `sonarjs/no-commented-code`**: ele junta comentários de linha vizinhos e analisa o grupo inteiro, então uma linha de código logo abaixo de uma linha de prosa, sem linha em branco, passa. Comentário HTML (`<!-- -->`) no markup do `.svelte` também não é analisado; o `<script>` é. Aceito: é a regra pedida no plano, e corrigir isso seria escrever outro detector.
 - **D7. Backend: código comentado detectado por teste estrutural JUnit com heurística (`CommentedCodeDetector`)**: o Checkstyle e o PMD não têm regra para isso. O detector lê o fonte ignorando strings, text blocks e chars, e marca a linha de comentário que termina em `;`, `{` ou `}`, ou que é só uma anotação. Javadoc fica de fora, porque exemplo de uso em `{@code}` é legítimo. Fica em `src/test`, porque é sensor, não produto.
+- **D8. `refactor-check.sh` usa jscpd e knip como dependências do frontend e o PMD como plugin do Maven sem execução ligada a fase**: assim as versões ficam fixadas como no resto (lockfile e `pom.xml`) e o PMD nunca roda no `verify`. A complexidade cognitiva do frontend roda com `--rule 'sonarjs/cognitive-complexity: [warn, 15]'` por cima da config normal, para não entrar no `pnpm lint`. O jscpd também lê `.svelte`.
 
 ## Perguntas em aberto
