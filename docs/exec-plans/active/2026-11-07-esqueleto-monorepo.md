@@ -46,8 +46,8 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 - [x] Formatação automática nos dois
 - [x] Comando único de verificação na raiz
 - [x] Dockerfiles e `docker-compose.yml`
-- [ ] CI no GitHub Actions
-- [ ] Atualizar `AGENTS.md`
+- [x] CI no GitHub Actions
+- [x] Atualizar `AGENTS.md`
 
 ## Log de progresso
 
@@ -73,6 +73,7 @@ Criar o mínimo para que um agente consiga mudar código e saber, sozinho, se qu
 - **D9. Comandos em `scripts/verify.sh` e `scripts/format.sh`, sempre via `mise exec`**: ficam ao lado de `plan-check.sh`, e usam as versões do `mise.toml` mesmo se o shell não tiver o mise ativado.
 - **D10. Dockerfiles multi-stage (JDK/Node para build, JRE/Node slim para rodar)**: imagem final menor e sem ferramentas de build. O build da imagem pula testes e Spotless, que já são cobertos por `verify.sh`.
 - **D11. Portas 8080 (backend) e 3000 (frontend), e `name: suportedesk` no compose**: portas padrão de cada stack; o nome fixo evita que o projeto Docker mude de nome conforme a pasta (worktree ou checkout principal).
+- **D12. CI com `jdx/mise-action`, rodando só `scripts/verify.sh`**: instala exatamente as versões do `mise.toml`, e o CI executa o mesmo comando que roda local. Sem cache extra, como o plano pede.
 
 ## Perguntas em aberto
 
