@@ -8,7 +8,7 @@ Todo o código daqui é escrito por agentes. Esta base cobre os riscos que mais 
 
 | Ameaça | Como é coberta |
 |---|---|
-| Agente grava chave, token ou senha no código | gitleaks no `verify.sh`; secret scanning e push protection do GitHub para o histórico |
+| Agente grava chave, token ou senha no código | gitleaks no `verify.sh`, nos arquivos e nos commits ainda não publicados; secret scanning e push protection do GitHub para o que já foi publicado |
 | Biblioteca com vulnerabilidade conhecida | OSV-Scanner no `verify.sh`, nos dois lados, qualquer gravidade |
 | Pacote recém-publicado e comprometido | pnpm só instala versão com 3 dias ou mais; Dependabot com o mesmo cooldown |
 | Pacote republicado com procedência pior (ex.: sem provenance depois de ter) | `trustPolicy: no-downgrade` no pnpm |
@@ -24,7 +24,8 @@ Todo o código daqui é escrito por agentes. Esta base cobre os riscos que mais 
 - Análise estática de segurança do nosso código (SAST, ex.: CodeQL).
 - Imagem Docker: scan, usuário sem root, imagem base fixada por digest.
 - Script Node ou Python rodado pelo agente que abre um arquivo de credencial sozinho: as regras `deny` cobrem as ferramentas do Claude Code e os comandos de arquivo que ele reconhece no Bash (`cat`, `head`, `tail`, `sed`...), não qualquer processo. Fechar isso pede o sandbox do Claude Code (`sandbox.enabled`).
-- Segredo que já foi para o histórico do git: o gitleaks olha só os arquivos atuais. O histórico publicado depende do secret scanning do GitHub.
+- Segredo que já está no `origin/main`: o gitleaks olha os arquivos e os commits que ainda não estão lá. O que já foi publicado depende do secret scanning do GitHub, que só reconhece padrões de provedor (senha ou segredo genérico passam, com non-provider patterns desligado).
+- No CI o checkout é raso (só o último commit) e não traz o `origin/main`, então lá o gitleaks vê só o commit do push. A garantia sobre os commits anteriores é o pre-push local.
 - Dependência que já está no lockfile não é reavaliada pela idade mínima do pnpm; só o OSV-Scanner a confere.
 - Checklist de segurança na revisão de PR (skill `revisar`).
 - Isolamento entre tenants, LGPD e limites de ação da IA: são decisões de produto.
@@ -43,7 +44,7 @@ Todo o código daqui é escrito por agentes. Esta base cobre os riscos que mais 
 
 O backend é escaneado pela árvore que o Maven resolve (`mvnw dependency:list`), com as dependências transitivas. O OSV-Scanner lendo o `pom.xml` direto não vê as versões que vêm do parent do Spring Boot.
 
-O gitleaks varre os arquivos versionados e os novos que o git não ignora: o que pode entrar num commit.
+O gitleaks varre os arquivos versionados e os novos que o git não ignora (o que pode entrar num commit) e os commits de `origin/main..HEAD` (o que vai no push). Sem `origin/main`, varre todo o histórico disponível.
 
 ## Exceções
 
@@ -63,7 +64,7 @@ reason = "por que é aceitável por enquanto: onde a biblioteca entra e por que 
 - `id`, `reason` e `ignoreUntil` são obrigatórios. `ignoreUntil` é uma data sem aspas.
 - O prazo máximo é de 30 dias a partir de hoje. Como o arquivo não guarda a data de criação, a checagem recusa qualquer `ignoreUntil` mais de 30 dias depois do dia em que roda.
 - Exceção vencida falha. Renove só com um novo motivo no log de decisões, ou apague.
-- `[[PackageOverrides]]` não é aceito: ele ignora o pacote inteiro, não uma vulnerabilidade.
+- O arquivo só aceita blocos `[[IgnoredVulns]]` com as chaves `id`, `ignoreUntil` e `reason`, cada uma numa linha. Qualquer outra forma é recusada, inclusive tabela inline (`IgnoredVulns = [{ ... }]`) e `PackageOverrides`, que ignora o pacote inteiro.
 
 ### Falso positivo de segredo (`.gitleaks.toml`)
 
@@ -77,11 +78,12 @@ paths = ['''caminho/do/arquivo''']
 
 - Sem `description`, a checagem falha.
 - Comentário `gitleaks:allow` e arquivo `.gitleaksignore` não valem: não guardam o motivo.
+- O arquivo só aceita `[extend]` com `useDefault = true` e blocos `[[allowlists]]`. Desligar ou trocar regra (`disabledRules`, `[[rules]]`, `[allowlist]`, `useDefault = false`, `extend` de outro arquivo) é recusado.
 - Falso positivo não tem prazo.
 
 ### Segredo de verdade no código
 
-Não há exceção. Tire o valor do arquivo e leia de variável de ambiente ou de um `.env` ignorado pelo git. Se ele já entrou num commit, considere vazado: peça ao humano para revogar a credencial e reescreva o commit antes do push.
+Não há exceção. Tire o valor do arquivo e leia de variável de ambiente ou de um `.env` ignorado pelo git. Se ele já entrou num commit, apagar num commit novo não basta: o commit antigo vai junto no push e a checagem continua falhando. Refaça os commits sem o segredo (`git reset --soft origin/main`, tire o valor, commite de novo). Se algum desses commits já foi para um branch remoto, considere a credencial vazada e peça ao humano para revogá-la.
 
 ## Configurações do GitHub
 
