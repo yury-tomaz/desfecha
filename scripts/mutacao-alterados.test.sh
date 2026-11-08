@@ -2,6 +2,10 @@
 # Casos de scripts/mutacao-alterados.sh. Rodado por scripts/verify.sh.
 set -euo pipefail
 cd "$(dirname "$0")"
+# O hook de pre-push roda com GIT_DIR do repositório de verdade. Herdado, ele faria o git init, os commits
+# e o update-ref do origin/main dos casos no repositório de verdade, não no temporário.
+# shellcheck disable=SC2046
+unset $(git rev-parse --local-env-vars)
 checagem=$PWD/mutacao-alterados.sh
 
 falhas=0
@@ -84,6 +88,17 @@ g checkout -q escopo
 escreve frontend/src/lib/do-escopo.ts
 g add -A && g commit -qm escopo
 confere 0 "frontend/src/lib/do-escopo.ts" "o que entrou no origin/main depois do merge-base fica de fora"
+
+base
+escreve frontend/src/lib/novo.ts
+outro=$(mktemp -d)
+git -C "$outro" init -q
+saida=$(GIT_DIR=$outro/.git "$checagem" "$raiz" 2>&1) || true
+rm -rf "$outro"
+if [ "$saida" != "frontend/src/lib/novo.ts" ]; then
+  echo "mutacao-alterados: com GIT_DIR de outro repositório no ambiente (como no hook de pre-push), listou o repositório errado: $saida"
+  falhas=$((falhas + 1))
+fi
 
 base
 g update-ref -d refs/remotes/origin/main

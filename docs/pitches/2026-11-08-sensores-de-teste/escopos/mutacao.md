@@ -24,6 +24,7 @@ Teste de mutação nos dois lados (PIT no backend, Stryker no frontend), bloquea
 - 2026-11-08: casos de borda. Interface Java sem código e `.ts` só com tipos passam; classe Java e `.ts` com código e sem nenhum teste falham (`Mutation score of 0`, `NO_COVERAGE`; `No tests were executed`).
 - 2026-11-08: o Stryker trouxe o `qs` 6.15.1 (via `typed-rest-client`), com 4 vulnerabilidades conhecidas no OSV-Scanner; corrigido com override (D10).
 - 2026-11-08: os passos de mutação foram para o fim do `verify.sh`: antes do `pnpm install` do frontend, no CI o Stryker ainda não estaria instalado.
+- 2026-11-08: bug no primeiro push. O hook de pre-push roda com `GIT_DIR` definido, e o `mutacao-alterados.test.sh` não o limpava: os comandos git dos casos foram para o repositório de verdade (um commit `base` no topo deste branch, um branch `escopo`, o `origin/main` local movido, o índice do worktree trocado e `core.bare = true` no `.git/config`). Nada foi publicado: o `verify.sh` falhou e o push parou. Estado local desfeito à mão (`core.bare` de volta a `false`, branch de volta ao último commit, `escopo` apagado, `git fetch` do `origin/main`). Reproduzido com um repositório isca em `GIT_DIR`; corrigido com o mesmo `unset $(git rev-parse --local-env-vars)` do `segredos-check.test.sh`, e a isca ficou intacta. Caso novo: com `GIT_DIR` de outro repositório, o script lista o repositório certo.
 
 ## Log de decisões
 
