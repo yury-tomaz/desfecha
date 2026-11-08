@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Ativado por `git config core.hooksPath .githooks` (setup no AGENTS.md).
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+if ! scripts/verify.sh; then
+  echo >&2
+  echo "Push recusado: scripts/verify.sh falhou. Corrija o que a saída acima aponta (scripts/format.sh resolve formatação) e faça o push de novo. Não use --no-verify." >&2
+  exit 1
+fi

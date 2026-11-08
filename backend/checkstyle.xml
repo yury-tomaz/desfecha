@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN" "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<module name="Checker">
+  <module name="TreeWalker">
+    <module name="TodoComment">
+      <property name="format" value="(TODO|FIXME)(?!\(\d{4}-\d{2}-\d{2}-[a-z0-9]+(-[a-z0-9]+)*\): )"/>
+      <message key="todo.match" value="TODO ou FIXME sem exec-plan. Escreva no formato TODO(&lt;slug-do-plano&gt;): texto, com o nome do arquivo do plano sem .md (ex.: TODO(2026-11-07-sensores-computacionais): ...), ou apague o comentário."/>
+    </module>
+  </module>
+</module>

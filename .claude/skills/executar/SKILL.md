@@ -44,7 +44,7 @@ Daqui em diante, trabalhe só dentro de `.worktrees/<slug>`.
 - Atualize o log de progresso durante o trabalho, não só no fim.
 - Toda decisão técnica dentro do escopo: tome, e registre em "Log de decisões" com o motivo.
 - O que estiver em "Fora de escopo" não é feito, mesmo que pareça útil. Se achar algo importante fora do escopo, anote em "Log de progresso" como sugestão de próxima tarefa.
-- Rode `scripts/verify.sh` antes de cada commit. Nunca use `git commit --no-verify`.
+- Rode `scripts/verify.sh` antes de cada push (o hook de pre-push também roda). O commit é livre. Nunca use `git push --no-verify`.
 
 Todo código é escrito no ciclo abaixo (Extreme Programming), em passos pequenos.
 
@@ -69,13 +69,15 @@ Todo código é escrito no ciclo abaixo (Extreme Programming), em passos pequeno
 
 - Só com tudo verde, e sem mudar comportamento: os testes não mudam.
 - Siga as 4 regras do design simples, em ordem: passa nos testes; revela a intenção; não tem duplicação; tem o menor número de elementos possível.
+- Rode `scripts/refactor-check.sh`: ele lista duplicação, código morto e complexidade cognitiva. Os achados são candidatos, não erros.
 - Na prática: nomes melhores, extrair funções, remover duplicação, apagar código morto, aplicar a regra de comentários abaixo.
-- Rode `scripts/verify.sh` e faça um commit separado (`refactor: ...`).
+- Com os testes verdes, faça um commit separado (`refactor: ...`).
 
 ### Regra de comentários
 
 - Comentário só explica o **porquê** que o código não consegue dizer: regra de negócio não óbvia, restrição externa, contorno de bug (com link), decisão que parece errada mas é intencional.
 - Proibido: descrever o que o código faz; narrar intenção ou pensamento ("aqui vamos...", "agora precisamos..."); histórico de mudança ("alterado para...", "antes era..."), que é papel do git; código comentado; TODO sem tarefa associada.
+- TODO e FIXME só no formato `TODO(<slug-do-plano>): texto`, com o nome do arquivo do plano sem `.md` (ex.: `// TODO(2026-11-07-sensores-computacionais): ...`). O lint recusa qualquer outro formato, e também código comentado.
 - No refactoring, todo comentário é candidato a sair. Se um nome melhor ou uma função extraída diz o mesmo, troque.
 
 ## 6. Bloqueio
