@@ -27,7 +27,7 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - [ ] Uma chave falsa com formato real (ex.: um token de AWS de exemplo) num arquivo commitado faz `scripts/verify.sh` falhar com mensagem que diz como corrigir. Remover faz passar. Registrar no log de progresso.
 - [ ] Uma dependência com vulnerabilidade conhecida (uma versão antiga de propósito, no `pom.xml` e no `package.json`) faz `scripts/verify.sh` falhar. Uma exceção no `osv-scanner.toml` com motivo e data futura faz passar. A mesma exceção com data passada volta a falhar, assim como uma exceção sem motivo ou com prazo de mais de 30 dias. Registrar no log de progresso.
 - [ ] `frontend/pnpm-workspace.yaml` tem `minimumReleaseAge`, `trustPolicy` e `blockExoticSubdeps`, e o `mise.toml` fixa um pnpm que aceita todos. Comprovado assim: tentar instalar uma versão publicada há menos de 3 dias é recusado; registrar o comando e a saída no log de progresso.
-- [ ] `.github/dependabot.yml` cobre `maven`, `npm` e `github-actions`, com cooldown. Comprovado lendo o arquivo. Ligar Dependabot alerts e security updates no GitHub é passo do humano: fica listado em `docs/SECURITY.md` e na descrição do PR, com o comando `gh api` que confere.
+- [x] `.github/dependabot.yml` cobre `maven`, `npm` e `github-actions`, com cooldown. Comprovado lendo o arquivo. Ligar Dependabot alerts e security updates no GitHub é passo do humano: fica listado em `docs/SECURITY.md` e na descrição do PR, com o comando `gh api` que confere.
 - [ ] Todas as actions em `.github/workflows/` estão fixadas por SHA completo, os workflows declaram `permissions`, e zizmor e actionlint rodam em `scripts/verify.sh`. Comprovado assim: trocar um SHA por tag faz a verificação falhar; reverter faz passar.
 - [ ] `.claude/settings.json` impede o agente de ler `.env`, `~/.ssh` e `~/.aws`. Comprovado listando no log de progresso as formas testadas (ex.: `Read` de `.env`, `cat .env`, `cat ~/.ssh/id_ed25519`) e o resultado de cada uma.
 - [ ] `docs/SECURITY.md` existe, em português, e traz: as ameaças que esta base cobre e as que ainda não cobre; cada camada e onde está configurada; como registrar uma exceção; as configurações esperadas do GitHub e o comando `gh api` que as confere; como reportar uma vulnerabilidade. Comprovado lendo o arquivo.
@@ -51,8 +51,8 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - [x] gitleaks em `scripts/verify.sh`, com config e regra de exceção
 - [x] OSV-Scanner em `scripts/verify.sh`, com `osv-scanner.toml`
 - [x] Endurecer o pnpm em `frontend/pnpm-workspace.yaml`
-- [ ] `.github/dependabot.yml`
-- [ ] Actions por SHA, `permissions`, zizmor e actionlint em `scripts/verify.sh`
+- [x] `.github/dependabot.yml`
+- [x] Actions por SHA, `permissions`, zizmor e actionlint em `scripts/verify.sh`
 - [ ] Regras `deny` de segredos em `.claude/settings.json`
 - [ ] `docs/SECURITY.md`
 - [ ] Atualizar `AGENTS.md` e a skill `executar`
@@ -70,6 +70,8 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - 2026-11-07: critério das dependências. Com `org.apache.commons:commons-text:1.9` no `pom.xml` e `minimist@1.2.5` no `package.json`, `scripts/verify.sh` saiu com 1 listando GHSA-599f-7c49-w659 e GHSA-xvch-5gv4-984h. Exceção para os dois ids em `osv-scanner.toml`: com reason e `ignoreUntil = 2026-11-20` saiu com 0 (`verificação ok`); com `ignoreUntil = 2026-11-01` saiu com 1 (`exceção ... venceu em 2026-11-01`); sem reason saiu com 1 (`exceção ... sem reason`); com `ignoreUntil = 2026-12-08` saiu com 1 (`vai até 2026-12-08, mais de 30 dias depois de hoje`). Dependências de teste removidas depois.
 - 2026-11-07: `frontend/pnpm-workspace.yaml` com `minimumReleaseAge: 4320`, `trustPolicy: no-downgrade` e `blockExoticSubdeps: true`; `pnpm install --frozen-lockfile` passa com o pnpm 10.34.9. Critério da idade mínima: `cd frontend && mise exec -- pnpm add -D hono@4.13.17` (publicada em 2026-11-07T04:56Z) saiu com 1 e `ERR_PNPM_NO_MATURE_MATCHING_VERSION  Version 4.13.17 (released 21 hours ago) of hono does not meet the minimumReleaseAge constraint`; `hono@4.13.16` resolveu normalmente. Nada do teste ficou no `package.json` nem no lockfile.
 - 2026-11-07: observação: `knip@6.44.2`, publicada hoje, já estava no lockfile antes desta tarefa. O `minimumReleaseAge` só age quando o pnpm resolve uma versão nova; o que já está no lockfile não é reavaliado.
+- 2026-11-07: `.github/dependabot.yml` com `maven` (`/backend`), `npm` (`/frontend`) e `github-actions` (`/`), semanal, `cooldown.default-days: 3`.
+- 2026-11-07: workflow com `actions/checkout` e `jdx/mise-action` por SHA, `permissions: contents: read` e `persist-credentials: false`. actionlint e zizmor (offline) no `verify.sh`. Antes da correção o zizmor acusou `unpinned-uses` nas duas actions e `excessive-permissions`. Critério: com `actions/checkout@v7.0.1` no lugar do SHA, `scripts/verify.sh` saiu com 1 (`error[unpinned-uses]: unpinned action reference`, linha 13); com o SHA de volta, saiu com 0.
 
 ## Log de decisões
 
@@ -80,5 +82,7 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - **D5. minimatch forçado para 11.0.4 com `overrides` no `pnpm-workspace.yaml`**: a correção da GHSA-g3hv-75wg-m249 só existe na 11.x e eslint, `@eslint/config-array` e `@typescript-eslint/typescript-estree`, na versão mais nova, ainda pedem `^10`. Lint, testes das regras do ESLint, tipos e build passam com a 11. A 11.0.4 é de 2026-11-02, mais velha que os 3 dias do `minimumReleaseAge`; a 11.0.5 não seria aceita.
 - **D6. Exceção para deepmerge (GHSA-gcqx-w48m-w2h4) até 2026-12-07**: não há versão corrigida (a 4.3.1 é a última e está afetada). Entra só no build, pelo `@sveltejs/vite-plugin-svelte`, mesclando a nossa própria configuração, sem entrada de usuário. Prazo de 30 dias, o máximo.
 - **D7. Limite de 30 dias contado a partir de hoje**: o `osv-scanner.toml` não guarda a data de criação. A checagem recusa `ignoreUntil` mais de 30 dias depois do dia em que roda, então nenhuma exceção fica com mais de 30 dias pela frente. Limite conhecido: renovar o prazo é só editar a data, mas isso exige commit e aparece no PR. Exceção vencida também falha, com mensagem própria, para não ficar esquecida no arquivo. Só `[[IgnoredVulns]]` é aceito: `[[PackageOverrides]]` ignora o pacote inteiro.
+- **D8. Actions fixadas na release exata, com idade mínima**: `actions/checkout` v7.0.1 (`3d3c42e5...`, 2026-07-20) e `jdx/mise-action` v5.2.6 (`f5be966e...`, 2026-11-02). A v5.2.7 do mise-action saiu em 2026-11-06, menos de 3 dias antes; segue a mesma regra do pnpm e do cooldown do Dependabot. SHAs conferidos com `gh api repos/<dono>/<action>/commits/<tag> --jq .sha`.
+- **D9. zizmor offline no `verify.sh` e online num passo próprio do CI**: o `verify.sh` instala dependências de terceiros (com script de instalação, como o esbuild); um `GH_TOKEN` no ambiente dele ficaria ao alcance desses scripts. Por isso o token vai só no passo `zizmor com as auditorias online`, que roda antes de qualquer instalação. Local, o `verify.sh` roda offline e não precisa de token. A política padrão do zizmor 1.32 já exige SHA para toda action, então não há `zizmor.yml`.
 
 ## Perguntas em aberto
