@@ -78,4 +78,19 @@ class CommentedCodeDetectorTest {
 
     assertThat(CommentedCodeDetector.lines(source)).isEmpty();
   }
+
+  @Test
+  void flagsBlockDelimitersAndAnnotations() {
+    String source =
+        """
+        class A {
+          // @Test
+          // void antigo() {
+          // }
+          // Ver RFC 9110 (seção 15.5.20) {exemplo}.
+        }
+        """;
+
+    assertThat(CommentedCodeDetector.lines(source)).containsExactly(2, 3, 4);
+  }
 }

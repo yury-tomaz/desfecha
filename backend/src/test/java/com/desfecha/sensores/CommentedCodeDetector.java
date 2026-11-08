@@ -2,15 +2,18 @@ package com.desfecha.sensores;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 final class CommentedCodeDetector {
+
+  private static final Pattern CODE = Pattern.compile("^(.*[;{}]|@\\w+(\\(.*\\))?)$");
 
   private CommentedCodeDetector() {}
 
   static List<Integer> lines(String source) {
     List<Integer> found = new ArrayList<>();
     for (Comment comment : comments(source)) {
-      if (comment.text().strip().endsWith(";")) {
+      if (CODE.matcher(comment.text().strip()).matches()) {
         found.add(comment.line());
       }
     }
