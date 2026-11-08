@@ -1,6 +1,6 @@
 ---
 name: moldar
-description: Dá forma a um problema junto com o humano até virar um pitch (com protótipo, quando tem interface), roda a revisão do protótipo e grava a aposta ou o descarte. Use quando o humano trouxer um problema novo ou quiser continuar um pitch em shaping.
+description: Dá forma a um problema junto com o humano até virar um pitch (com protótipo, quando tem interface), roda a revisão do protótipo e grava a aposta ou o descarte. Use quando o humano trouxer um problema novo quiser continuar um pitch em shaping, ou decidir voltar ao shaping ou descartar um pitch bloqueado.
 disable-model-invocation: true
 ---
 
@@ -15,6 +15,7 @@ A conversa vira o pitch, não fica no chat. Cada resposta do humano muda o pitch
 ## Entrada
 
 - Com o caminho de um pitch em `shaping`: continue esse pitch.
+- Com o caminho de um pitch `bloqueado`: siga a seção 5.
 - Sem caminho: pergunte qual é o problema e crie `docs/pitches/<AAAA-MM-DD>-<slug>/pitch.md` no formato de `docs/PLANS.md`, com `Estado: shaping` e `Apetite: a definir`.
 
 ## 1. Shaping
@@ -84,6 +85,28 @@ Só o humano aposta. Quando o pitch estiver pronto:
 3. **Aposta:** troque para `Estado: apostado` e registre no "Log de decisões": `AAAA-MM-DD: apostado pelo humano.` Rode `scripts/plan-check.sh <pasta-do-pitch>`: se falhar, volte para `shaping` e corrija o que ele aponta. Commit no `main` (`pitch: aposta <slug>`) e push.
 4. **Descarte:** apague a pasta do pitch e as telas do protótipo que só ele usa, com `git rm -r`. Commit no `main` (`pitch: descarta <slug>`, com o motivo do humano na mensagem) e push. O git guarda; não há backlog.
 5. Sem resposta, o pitch continua `shaping`.
+
+## 5. Pitch bloqueado
+
+O build parou numa pergunta (seção 7 da `executar`), e o humano decide. Responder ou cortar escopo continua o build: indique `/executar <pasta-do-pitch>` e pare. Aqui ficam voltar ao shaping e descartar. Sem a decisão dita na sessão, pergunte.
+
+Tudo acontece no `main`, atualizado (`git pull --ff-only`). O que já foi mergeado do stack está nele; o resto está só nos branches `pitch/<slug>/*`.
+
+1. **Encerre o stack.** Liste os PRs do pitch:
+
+   ```bash
+   gh pr list --state all --limit 100 --json number,state,headRefName \
+     --jq '.[] | select(.headRefName | startswith("pitch/<slug>/"))'
+   ```
+
+   Feche cada PR aberto com `gh pr close <n> --delete-branch`. Remova a worktree (`git worktree remove .worktrees/<slug>`) e os branches locais do pitch, se existirem nesta máquina.
+2. **Registre a decisão.** Tire a pergunta de "Perguntas em aberto" (do pitch, ou do escopo onde ela estava) e registre no "Log de decisões" do pitch: a pergunta, a decisão do humano com o motivo, a data e os PRs que já foram mergeados.
+3. **Voltar ao shaping:** troque para `Estado: shaping`, no mesmo commit. Os escopos mergeados ficam em `escopos/` e contam no apetite do novo shaping. Commit (`pitch: volta ao shaping <slug>`), push, e continue pela seção 1.
+4. **Descartar:**
+   - Sem escopo mergeado: apague a pasta do pitch, como no descarte da seção 4.
+   - Com escopo mergeado: o pitch fica como contexto do código que já está no `main`, e dos `TODO(<pasta-do-pitch>)`. Troque para `Estado: entregue` e registre em "No-gos" o que não foi construído, com o motivo do humano. `scripts/plan-check.sh` aceita, porque todo escopo mergeado foi concluído com os critérios marcados. Reverter o que foi mergeado é decisão do humano, num pitch próprio.
+
+   Commit (`pitch: descarta <slug>`, com o motivo do humano na mensagem) e push.
 
 ## Commits
 
