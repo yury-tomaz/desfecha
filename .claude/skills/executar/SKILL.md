@@ -1,6 +1,6 @@
 ---
 name: executar
-description: Constrói um pitch apostado em escopos descobertos durante o trabalho, um PR por escopo, numa worktree isolada, com TDD e o circuit breaker do apetite. Use quando houver um pitch com Estado apostado, ou para continuar um pitch em-build.
+description: Constrói um pitch apostado em escopos descobertos durante o trabalho, um PR por escopo empilhados num stack do GitHub, numa worktree isolada, com TDD e o circuit breaker do apetite. Use quando houver um pitch com Estado apostado, ou para continuar um pitch em-build.
 disable-model-invocation: true
 ---
 
@@ -47,24 +47,37 @@ Se não cabe, **não crie o escopo**. Vá para a seção 7 (Bloqueio) e escreva 
 
 ## 5. Construir um escopo
 
-Para cada escopo, um de cada vez:
+Os escopos de um pitch formam um **stack de PRs** (PRs empilhados do GitHub, pela extensão `gh stack`): cada escopo é um branch em cima do anterior, e o PR dele aponta para o branch de baixo. Quem revisa vê só o diff do escopo, e o build não espera merge para seguir.
 
-1. A partir do `main` atualizado, crie a worktree:
+### Preparar (uma vez por pitch)
+
+1. Confira a extensão: `gh stack --version`. Sem ela, instale fixada na versão registrada no log de decisões de `docs/historico/exec-plans/2026-11-08-shape-up.md` (D15): `gh extension install github/gh-stack --pin v0.3.0`. Versão nova da extensão é dependência nova: siga o passo 6 de "Para cada escopo". Se não der para instalar, siga sem ela: o `gh pr create --base` já empilha os PRs, e só o agrupamento do `gh stack link` fica faltando; registre no log de decisões do escopo.
+2. Uma worktree por pitch, a partir do `main` atualizado, com o branch do primeiro escopo:
 
    ```bash
-   git worktree add .worktrees/<slug>-<escopo> -b pitch/<slug>/<escopo>
+   git worktree add .worktrees/<slug> -b pitch/<slug>/<escopo>
+   cd .worktrees/<slug> && gh stack init pitch/<slug>/<escopo>
    ```
 
-   Daqui até o PR, trabalhe só dentro dela.
+   Daqui em diante, trabalhe só dentro dela. Na continuação de um build, `gh stack checkout <pr-ou-branch>` traz o stack.
+
+### Para cada escopo, um de cada vez
+
+1. Do segundo escopo em diante, no topo do stack (`gh stack top`): `gh stack add pitch/<slug>/<escopo>`.
 2. Crie ou atualize `escopos/<escopo>.md` e registre no log de progresso: `AAAA-MM-DD: escopo iniciado.`
 3. Construa no ciclo da seção 6. Atualize o log de progresso durante o trabalho, não só no fim.
 4. Toda decisão técnica dentro do pitch: tome, e registre em "Log de decisões" do escopo com o motivo.
 5. Rode `scripts/verify.sh` antes de cada push (o hook de pre-push também roda). O commit é livre. Nunca use `git push --no-verify`.
 6. Dependência nova (biblioteca, plugin do Maven, action, ferramenta no `mise.toml`): antes de instalar, confira no registro (`pnpm view <pacote>`, Maven Central, GitHub) que o pacote é o esperado. Registre no log de decisões do escopo o motivo e a confirmação: nome exato, autor ou organização, repositório de origem. Nome parecido com o de um pacote conhecido, autor desconhecido ou repositório que não bate: não instale. Versão publicada há menos de 3 dias não entra.
 7. Exceção de segurança (vulnerabilidade em `osv-scanner.toml`, falso positivo em `.gitleaks.toml`): só quando corrigir não é possível agora, nas regras de `docs/SECURITY.md`. Registre o motivo no log de decisões do escopo. Exceção de vulnerabilidade tem prazo de no máximo 30 dias a partir do dia em que é criada.
-8. Conclua o escopo pela seção 8.
+8. Conclua o escopo pela seção 8 e siga para o próximo, sem esperar merge.
 
-Se o próximo escopo depende de um PR que ainda não foi para o `main`, pare depois de abrir o PR e informe o humano: o build continua com `/executar <pasta-do-pitch>` depois do merge.
+### Manter o stack
+
+- Mudança num escopo de baixo (pedido da revisão, bug): vá ao branch dele (`gh stack down` ou `gh stack checkout <branch>`), faça o ciclo da seção 6, e depois `gh stack rebase --upstack` e `gh stack push`. Conflito: resolva e `gh stack rebase --continue`; se não sair, `gh stack rebase --abort` e seção 7.
+- Depois que o humano faz merge de um PR de baixo: `gh stack sync` antes de continuar.
+- O `gh stack push` empurra todos os branches de uma vez, com `--force-with-lease`. O hook de pre-push roda o `scripts/verify.sh` no branch em que você está; rode também em cada branch que mudou.
+- Não use `gh stack modify`, que é interativo, nem `gh stack submit`, que abre os PRs com título e descrição gerados. Os PRs são abertos pela seção 8.
 
 ## 6. Ciclo de construção
 
@@ -116,8 +129,9 @@ Se surgir algo que precisa de julgamento humano (produto, critério de aceite im
 1. Verifique cada critério de aceite do escopo pelo meio que ele indica, e marque `- [x]`. Se algum não passar, não conclua: corrija ou bloqueie.
 2. Registre `AAAA-MM-DD: escopo concluído.` no log de progresso do escopo.
 3. Se este é o último escopo (nada mais falta do pitch), troque o pitch para `Estado: entregue` neste mesmo branch. `scripts/plan-check.sh` recusa `entregue` com critério não marcado.
-4. Commit, push do branch e abra um PR para o `main` com `gh pr create`. A descrição resume o objetivo do escopo, os critérios verificados e as decisões, e aponta para a pasta do pitch.
-5. Informe o humano com o link do PR. Não faça merge.
+4. Commit, `gh stack push`, e abra o PR com `gh pr create --base <branch abaixo no stack>` (o `main`, no primeiro escopo). A descrição resume o objetivo do escopo, os critérios verificados e as decisões, aponta para a pasta do pitch, e diz a posição no stack (ex.: "escopo 2 de 3; depende do #12").
+5. Ligue o PR ao stack no GitHub, com todos os PRs do pitch em ordem, de baixo para cima: `gh stack link <pr-1> <pr-2> ...`.
+6. Informe o humano com o link do PR. Não faça merge. O build só para no circuit breaker, num bloqueio (seção 7) ou no último escopo.
 
 ## Não faça
 

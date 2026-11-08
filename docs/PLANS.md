@@ -10,7 +10,7 @@ Vale para tudo, produto e harness. Tarefa de harness tem shaping curto e não te
 2. **Protótipo** (skill `moldar`). Quando o pitch tem interface, a solução vira telas clicáveis em `prototipo/`, sem acabamento.
 3. **Revisão do protótipo** (agente revisor, skill `moldar`). Uma sessão sem a conversa do shaping revisa as telas antes da aposta, e os achados vão para o pitch. O humano só vê o protótipo na aposta.
 4. **Aposta** (humano). O humano aposta ou descarta. Aposta vira `Estado: apostado`. Descarte apaga a pasta do pitch, e o git guarda. Não há backlog.
-5. **Build** (agente sozinho, skill `executar`). Abre os escopos conforme os descobre, um PR por escopo. TDD, `scripts/verify.sh` e a revisão de PR (`revisar`) valem em todo escopo.
+5. **Build** (agente sozinho, skill `executar`). Abre os escopos conforme os descobre, um PR por escopo, empilhados num stack de PRs do GitHub (`gh stack`): cada PR aponta para o escopo de baixo, e o build não espera merge para seguir. TDD, `scripts/verify.sh` e a revisão de PR (`revisar`) valem em todo escopo.
 
 ## Apetite e circuit breaker
 
