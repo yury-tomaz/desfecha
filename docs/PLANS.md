@@ -12,6 +12,19 @@ Vale para tudo, produto e harness. Tarefa de harness tem shaping curto e não te
 4. **Aposta** (humano). O humano aposta ou descarta. Aposta vira `Estado: apostado`. Descarte apaga a pasta do pitch, e o git guarda. Não há backlog.
 5. **Build** (agente sozinho, skill `executar`). Abre os escopos conforme os descobre, um PR por escopo, empilhados num stack de PRs do GitHub (`gh stack`): cada PR aponta para o escopo de baixo, e o build não espera merge para seguir. TDD, `scripts/verify.sh` e a revisão de PR (`revisar`) valem em todo escopo.
 
+## Papel do humano
+
+O que só o humano faz, na ordem do fluxo. O "como" de cada passo está nas skills.
+
+1. **Trazer o problema:** `/moldar`.
+2. **Responder o shaping:** uma pergunta por vez, na sessão da `moldar`.
+3. **Apostar ou descartar:** responder na sessão da `moldar`, quando ela pergunta.
+4. **Disparar o build:** `/executar` (ou `/executar <pasta-do-pitch>` para continuar um `em-build`).
+5. **Disparar a revisão:** `/revisar <PR>`, a cada PR aberto ou atualizado.
+6. **Ler e fazer merge dos PRs do stack**, de baixo para cima. Pedido de mudança vira nova sessão da `executar`, e a revisão roda de novo.
+7. **Desbloquear:** responder a pergunta em "Perguntas em aberto" e decidir. Responder ou cortar escopo: `/executar <pasta-do-pitch>`. Voltar ao shaping ou descartar: `/moldar <pasta-do-pitch>`. A decisão é dita na sessão, e a skill grava.
+8. **Mudar a fase:** editar "Fase atual" no `AGENTS.md`.
+
 ## Apetite e circuit breaker
 
 O apetite é medido pela atenção do humano, não em semanas: cada escopo é um PR que ele vai ler. Não há ciclos fixos nem cooldown.
@@ -22,7 +35,7 @@ O apetite é medido pela atenção do humano, não em semanas: cada escopo é um
 | `grande` | até 4 | até 4 |
 | `a definir` | 0 | só no `shaping` |
 
-**Circuit breaker:** se o build precisa de mais escopos do que o apetite permite, o agente para, marca o pitch como `bloqueado` e descreve o que sobrou em "Perguntas em aberto". O humano decide: cortar escopo, voltar ao shaping ou descartar. O apetite nunca cresce sozinho.
+**Circuit breaker:** se o build precisa de mais escopos do que o apetite permite, o agente para, marca o pitch como `bloqueado` e descreve o que sobrou em "Perguntas em aberto". O humano decide: cortar escopo, voltar ao shaping ou descartar. Como cada decisão sai do `bloqueado`: "Papel do humano", passo 7. O apetite nunca cresce sozinho.
 
 ## Estados do pitch
 
@@ -33,8 +46,8 @@ A linha `Estado:` logo abaixo do título diz em que ponto o pitch está. O estad
 | `shaping` | Ainda tomando forma. Não pode ser construído. | Skill `moldar` |
 | `apostado` | O humano apostou. Pronto para o build. | Só o humano aposta, a skill `moldar` grava |
 | `em-build` | Uma sessão reservou e está construindo. | Skill `executar`, com commit e push no `main` |
-| `bloqueado` | Parou numa pergunta que precisa do humano, ou no circuit breaker. | Skill `executar` |
-| `entregue` | Todos os escopos construídos. Fica na pasta como histórico. | Skill `executar`, no PR do último escopo |
+| `bloqueado` | Parou numa pergunta que precisa do humano, ou no circuit breaker. | Skill `executar` bloqueia. Sai pela decisão do humano: responder ou cortar escopo, `executar` (volta a `em-build`); voltar ao shaping ou descartar, `moldar` |
+| `entregue` | Todos os escopos construídos. Fica na pasta como histórico. | Skill `executar`, no PR do último escopo; ou `moldar`, no descarte com escopo já mergeado |
 
 **Reserva:** a `executar` troca o pitch para `em-build` com commit e push no `main`. O push é a reserva: uma sessão por pitch.
 

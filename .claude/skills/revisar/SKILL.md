@@ -111,8 +111,20 @@ Na dúvida entre 🟢 e descartar, descarte.
 
 Quando o PR já tem uma revisão sua:
 - Para cada achado anterior, confira a correção no código e prove como no passo 4. Marque ✅ corrigido ou ❌ não corrigido, com a evidência.
-- Revise só o que mudou desde a revisão anterior (`git diff <commit revisado>..HEAD`), e só reporte 🔴 ou 🟠 nesse diff.
+- Revise só o que mudou desde a revisão anterior, e só reporte 🔴 ou 🟠 nesse trecho.
 - Não reabra o que já foi discutido sem fato novo.
+
+### O que mudou
+
+Num stack de PRs, o branch é reescrito quando o escopo de baixo muda (`gh stack rebase --upstack`). `git diff <commit revisado>..HEAD` passa a mostrar também o que veio de baixo, que não é deste PR. Por isso a re-revisão compara a série de commits do PR, não os commits:
+
+1. Pegue `<head-revisado>` e `<base-revisada>` da linha `Revisado: <head> sobre <base>` no fim da sua última revisão.
+   - Revisão sem essa linha (anterior ao formato atual): `<head-revisado>` é o `commit.oid` dela em `gh pr view <n> --json reviews`, e `<base-revisada>` é `git merge-base <head-revisado> origin/<baseRefName>`.
+2. Traga os commits antigos, se não estiverem na máquina: `git fetch origin <head-revisado> <base-revisada>`. O GitHub serve o commit pelo SHA mesmo depois de um force-push.
+3. Calcule a base atual: `git merge-base HEAD origin/<baseRefName>`, com o `baseRefName` de agora (`gh pr view <n> --json baseRefName`). Depois do merge do escopo de baixo, o PR aponta para o `main`, e a conta continua certa.
+4. Compare: `git range-diff <base-revisada>..<head-revisado> <base-atual>..HEAD`. Ele casa cada commit antigo com o novo e mostra só o que mudou neles.
+   - Par marcado como alterado por commit reordenado ou dividido: leia o patch inteiro do PR (`gh pr diff <n>`) naquele trecho.
+   - Commit antigo que não se consegue trazer: faça a revisão completa do PR, mantenha a conferência ✅/❌ dos achados anteriores, e diga no comentário por que a revisão foi completa.
 
 ## 6. Publicar
 
@@ -143,6 +155,8 @@ Formato do comentário:
 
 ### Sugestões para o harness
 - <achado que uma ferramenta determinística poderia pegar> → <regra proposta: lint, teste estrutural ou fitness function>
+
+Revisado: <head> sobre <base>
 ```
 
 - Marcadores:
@@ -159,9 +173,10 @@ Formato do comentário:
 - Ordene pelo marcador, na ordem da tabela.
 - 🟢, 💬 e ℹ️ podem ter só uma linha de explicação, sem Problema/Cenário/Sugestão.
 - A seção "Revisão anterior" só aparece em re-revisão.
-- Sem achados: escreva só `Nenhum achado.` (e as sugestões para o harness, se houver). Não invente achado para parecer útil.
+- Sem achados: escreva só `Nenhum achado.` (e as sugestões para o harness, se houver), mais a linha `Revisado:`. Não invente achado para parecer útil.
 - Sem elogios, sem resumo do que o PR faz.
 - A seção "Sugestões para o harness" só aparece se houver sugestão.
+- A última linha é sempre `Revisado: <head> sobre <base>`, com os SHAs completos do momento da revisão: `<head>` é `git rev-parse HEAD` no branch do PR, e `<base>` é `git merge-base HEAD origin/<baseRefName>`. É dela que a próxima re-revisão parte (seção 5).
 
 ## Não faça
 
