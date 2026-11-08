@@ -1,3 +1,5 @@
 engineStrict: true
 onlyBuiltDependencies:
   - esbuild
+overrides:
+  minimatch: 11.0.4

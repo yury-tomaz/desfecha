@@ -16,6 +16,12 @@ mise exec -- scripts/segredos-check.test.sh
 step "segredos: arquivos versionados e novos (gitleaks)"
 mise exec -- scripts/segredos-check.sh
 
+step "dependências: casos da checagem de exceções"
+scripts/dependencias-excecoes-check.test.sh
+
+step "dependências: vulnerabilidades conhecidas (OSV-Scanner)"
+mise exec -- scripts/dependencias-check.sh
+
 step "backend: build, testes e formatação (mvnw verify)"
 mise exec -- ./backend/mvnw -B -q -f backend/pom.xml verify
 

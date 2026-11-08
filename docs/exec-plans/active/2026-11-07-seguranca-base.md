@@ -49,7 +49,7 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 
 - [x] Fixar versões no `mise.toml` (gitleaks, osv-scanner, zizmor, actionlint e o pnpm exato)
 - [x] gitleaks em `scripts/verify.sh`, com config e regra de exceção
-- [ ] OSV-Scanner em `scripts/verify.sh`, com `osv-scanner.toml`
+- [x] OSV-Scanner em `scripts/verify.sh`, com `osv-scanner.toml`
 - [ ] Endurecer o pnpm em `frontend/pnpm-workspace.yaml`
 - [ ] `.github/dependabot.yml`
 - [ ] Actions por SHA, `permissions`, zizmor e actionlint em `scripts/verify.sh`
@@ -66,11 +66,17 @@ Todo o código deste repositório é escrito por agentes. Os riscos que mais pes
 - 2026-11-07: `mise.toml` fixa pnpm 10.34.9, gitleaks 8.30.1, osv-scanner 2.7.0, zizmor 1.32.0 e actionlint 1.7.12.
 - 2026-11-07: gitleaks em `scripts/segredos-check.sh`, com casos em `scripts/segredos-check.test.sh`, os dois rodados pelo `verify.sh`.
 - 2026-11-07: critério da chave falsa. Commit de `backend/src/main/resources/aws.properties` com um access key de AWS de formato real: `scripts/verify.sh` saiu com 1 no passo de segredos, com `RuleID: aws-access-token`, arquivo e linha, e a linha `Como corrigir: tire o valor do arquivo...`. Desfeito o commit e apagado o arquivo: `scripts/verify.sh` saiu com 0.
+- 2026-11-07: OSV-Scanner em `scripts/dependencias-check.sh`, que antes confere as exceções com `scripts/dependencias-excecoes-check.sh` (casos em `scripts/dependencias-excecoes-check.test.sh`). O código atual tinha duas vulnerabilidades no frontend, as duas em ferramenta de build: minimatch 10.2.6 (GHSA-g3hv-75wg-m249) e deepmerge 4.3.1 (GHSA-gcqx-w48m-w2h4). Ver D5 e D6.
+- 2026-11-07: critério das dependências. Com `org.apache.commons:commons-text:1.9` no `pom.xml` e `minimist@1.2.5` no `package.json`, `scripts/verify.sh` saiu com 1 listando GHSA-599f-7c49-w659 e GHSA-xvch-5gv4-984h. Exceção para os dois ids em `osv-scanner.toml`: com reason e `ignoreUntil = 2026-11-20` saiu com 0 (`verificação ok`); com `ignoreUntil = 2026-11-01` saiu com 1 (`exceção ... venceu em 2026-11-01`); sem reason saiu com 1 (`exceção ... sem reason`); com `ignoreUntil = 2026-12-08` saiu com 1 (`vai até 2026-12-08, mais de 30 dias depois de hoje`). Dependências de teste removidas depois.
 
 ## Log de decisões
 
 - **D1. pnpm 10.34.9**: a versão 10 mais nova no mise, publicada em 2026-10-25 (mais de 3 dias, coerente com o `minimumReleaseAge`), e acima do 10.21 que o `trustPolicy` exige.
 - **D2. gitleaks varre os arquivos atuais, não o histórico**: o critério pede que remover a chave faça passar, o que um scan do histórico nunca permitiria. Varre os arquivos versionados e os novos não ignorados (o que pode entrar num commit), copiados para uma pasta temporária para não varrer `node_modules`, `target` e afins. Segredo que já entrou num commit é tratado como vazado: a mensagem manda reescrever o commit antes do push e pedir ao humano a revogação. O histórico já publicado fica com o secret scanning e o push protection do GitHub.
 - **D3. Exceção do gitleaks só em `.gitleaks.toml` com `description`**: `gitleaks:allow` (desligado com `--ignore-gitleaks-allow`) e `.gitleaksignore` (recusado) não guardam motivo. Falso positivo não expira, então não tem prazo.
+- **D4. O backend é escaneado pela árvore que o Maven resolve, não pelo `pom.xml`**: o OSV-Scanner 2.7.0 lendo o `pom.xml` só vê as 4 dependências declaradas, sem versão (vêm do parent do Spring Boot), e as descarta; a resolução transitiva dele não rodou nem com o enricher `transitivedependency/pomxml`. `scripts/dependencias-check.sh` gera a lista com `mvnw dependency:list` (plugin padrão do Maven, sem dependência nova) e a passa ao OSV-Scanner no formato JSON dele (`-L osv-scanner:...`). São 86 pacotes, com as transitivas.
+- **D5. minimatch forçado para 11.0.4 com `overrides` no `pnpm-workspace.yaml`**: a correção da GHSA-g3hv-75wg-m249 só existe na 11.x e eslint, `@eslint/config-array` e `@typescript-eslint/typescript-estree`, na versão mais nova, ainda pedem `^10`. Lint, testes das regras do ESLint, tipos e build passam com a 11. A 11.0.4 é de 2026-11-02, mais velha que os 3 dias do `minimumReleaseAge`; a 11.0.5 não seria aceita.
+- **D6. Exceção para deepmerge (GHSA-gcqx-w48m-w2h4) até 2026-12-07**: não há versão corrigida (a 4.3.1 é a última e está afetada). Entra só no build, pelo `@sveltejs/vite-plugin-svelte`, mesclando a nossa própria configuração, sem entrada de usuário. Prazo de 30 dias, o máximo.
+- **D7. Limite de 30 dias contado a partir de hoje**: o `osv-scanner.toml` não guarda a data de criação. A checagem recusa `ignoreUntil` mais de 30 dias depois do dia em que roda, então nenhuma exceção fica com mais de 30 dias pela frente. Limite conhecido: renovar o prazo é só editar a data, mas isso exige commit e aparece no PR. Exceção vencida também falha, com mensagem própria, para não ficar esquecida no arquivo. Só `[[IgnoredVulns]]` é aceito: `[[PackageOverrides]]` ignora o pacote inteiro.
 
 ## Perguntas em aberto
