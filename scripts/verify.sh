@@ -58,8 +58,11 @@ step "frontend: formatação"
 step "frontend: lint (ESLint)"
 (cd frontend && mise exec -- pnpm lint)
 
-step "frontend: testes (Vitest)"
-(cd frontend && mise exec -- pnpm test)
+step "frontend: testes e cobertura (Vitest)"
+if ! (cd frontend && mise exec -- pnpm test); then
+  echo "Como corrigir: se um teste falhou, corrija o código (o teste só muda se estava errado, com registro no log de decisões). Se a cobertura ficou abaixo do mínimo (ERROR: Coverage for ...), escreva testes de comportamento para as linhas da coluna Uncovered Line #s da tabela acima. A cobertura mede só src/lib/**/*.ts e pede 80% de linhas e de branches no total." >&2
+  exit 1
+fi
 
 step "frontend: testes das regras locais do ESLint"
 (cd frontend && mise exec -- pnpm test:sensores)
